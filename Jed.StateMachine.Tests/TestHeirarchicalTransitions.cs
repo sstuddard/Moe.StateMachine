@@ -15,6 +15,7 @@ namespace Jed.StateMachine.Tests
 		{
 			GreenParent,
 			GreenChild,
+			GreenGrandChild,
 			RedParent,
 			RedChild,
 			Yellow
@@ -24,6 +25,12 @@ namespace Jed.StateMachine.Tests
 		{
 			Panic,
 			Change
+		}
+
+		[SetUp]
+		public void Setup()
+		{
+			events = new List<string>();
 		}
 
 		[Test]
@@ -53,6 +60,45 @@ namespace Jed.StateMachine.Tests
 			Assert.IsTrue(sm.InState(States.RedParent));
 			sm.PostEvent(Events.Change);
 			Assert.IsTrue(sm.InState(States.GreenChild));
+		}
+
+		[Test]
+		public void Test_Transition_ThreeLevelToTwoLevelTransition()
+		{
+			StateMachine sm = new StateMachine();
+			sm.AddState(States.GreenParent).OnEnter(OnEnter).OnExit(OnExit).InitialState()
+				.AddState(States.GreenChild).OnEnter(OnEnter).OnExit(OnExit).InitialState()
+					.AddState(States.GreenGrandChild).InitialState()
+						.TransitionTo(Events.Change, States.RedChild).OnEnter(OnEnter).OnExit(OnExit);
+			sm.AddState(States.RedParent).OnEnter(OnEnter).OnExit(OnExit)
+				.AddState(States.RedChild).OnEnter(OnEnter).OnExit(OnExit);
+
+			sm.Start();
+
+			events.Clear();
+
+			Assert.IsTrue(sm.InState(States.GreenParent));
+			Assert.IsTrue(sm.InState(States.GreenChild));
+			Assert.IsTrue(sm.InState(States.GreenGrandChild));
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.RedParent));
+			Assert.IsTrue(sm.InState(States.RedChild));
+
+			Assert.AreEqual("Exit: GreenGrandChild", events[0]);
+			Assert.AreEqual("Exit: GreenChild", events[1]);
+			Assert.AreEqual("Exit: GreenParent", events[2]);
+			Assert.AreEqual("Enter: RedParent", events[3]);
+			Assert.AreEqual("Enter: RedChild", events[4]);
+		}
+
+		private void OnEnter(object stateEntered)
+		{
+			events.Add("Enter: " + stateEntered.ToString());
+		}
+
+		private void OnExit(object stateEntered)
+		{
+			events.Add("Exit: " + stateEntered.ToString());
 		}
 	}
 }
