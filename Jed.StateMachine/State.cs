@@ -16,7 +16,7 @@ namespace Jed.StateMachine
 			this.actions = new StateActions(this);
 			this.substates = new Dictionary<object, State>();
 			this.id = id;
-			this.transitions = new TransitionDirector();
+			this.transitions = new TransitionDirector(this);
 			this.parent = parent;
 		}
 
@@ -42,11 +42,7 @@ namespace Jed.StateMachine
 
 		internal TransitionInstance EvaluateEvent(object eventToReceive)
 		{
-			Transition matching = transitions.FindTransition(eventToReceive);
-			if (matching != null)
-				return new TransitionInstance(this, matching);
-
-			return null;
+			return transitions.AcceptTransition(eventToReceive);
 		}
 
 		internal void AddTransition(Transition transition)

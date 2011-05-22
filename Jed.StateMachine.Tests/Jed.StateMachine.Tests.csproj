@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestComplexTransitions.cs" />
     <Compile Include="TestHeirarchicalTransitions.cs" />
     <Compile Include="TestSimpleTransitions.cs" />
     <Compile Include="TestStateCreation.cs" />

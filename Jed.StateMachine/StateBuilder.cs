@@ -23,7 +23,7 @@ namespace Jed.StateMachine
 
 		public StateBuilder DefaultTransition(object targetState)
 		{
-			return TransitionTo(stateMachine.DefaultEntryEvent, targetState);
+			return TransitionTo(StateMachine.DefaultEntryEvent, targetState);
 		}
 
 		public StateBuilder TransitionTo(object eventTarget, object targetState)

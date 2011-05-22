@@ -7,23 +7,25 @@ namespace Jed.StateMachine
 {
 	internal class TransitionDirector
 	{
+		private State state;
 		private List<Transition> transitions;
 
-		public TransitionDirector()
+		public TransitionDirector(State state)
 		{
-			transitions = new List<Transition>();
+			this.state = state;
+			this.transitions = new List<Transition>();
 		}
 
-		public Transition FindTransition(object eventTarget)
+		public TransitionInstance AcceptTransition(object eventTarget)
 		{
-			Transition result = null;
+			TransitionInstance result = null;
 			foreach (Transition transition in transitions)
 			{
 				if (transition.Matches(eventTarget))
 				{
 					if (result != null)
 						throw new InvalidOperationException("Multiple states eligible for transition");
-					result = transition;
+					result = new TransitionInstance(state, transition);
 				}
 			}
 			return result;

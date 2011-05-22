@@ -7,16 +7,18 @@ namespace Jed.StateMachine
 {
     public class StateMachine
     {
-		internal readonly object DefaultEntryEvent = new object();
+		internal static readonly object DefaultEntryEvent = new object();
 
     	private State current;
     	private State root;
     	private StateBuilder rootBuilder;
+    	private EventProcessor eventHandler;
 
 		public StateMachine()
 		{
 			root = new State("Root", null);
 			rootBuilder = new StateBuilder(this, root);
+			eventHandler = new EventProcessor();
 		}
 
     	public StateBuilder this[object idx] 
@@ -42,46 +44,10 @@ namespace Jed.StateMachine
 
 		public virtual void PostEvent(object eventToPost)
 		{
-			PostEventFull(eventToPost);
-		}
+			eventHandler.AddEvent(new EventInstance(eventToPost));
 
-		private void PostEventShallow(object eventToPost)
-		{
-			TransitionInstance transition = current.EvaluateEvent(eventToPost);
-			PerformTransition(transition);
-		}
-
-		private void PostEventFull(object eventToPost)
-		{
-			TransitionInstance transition = null;
-			current.VisitParentChain(s =>
-			{
-				TransitionInstance found = s.EvaluateEvent(eventToPost);
-				if (found != null && transition == null)
-					transition = found;
-			});
-
-			PerformTransition(transition);
-		}
-
-		private void PerformTransition(TransitionInstance transition)
-		{
-			// Perform state transition
-			if (transition != null)
-			{
-				current = transition.Transition();
-				HandleSuperStateEntry();
-			}
-		}
-
-		private void HandleSuperStateEntry()
-		{
-			State previous;
-			do
-			{
-				previous = current;
-				PostEventShallow(DefaultEntryEvent);
-			} while (current != previous);
+			while (eventHandler.CanProcess)
+				current = eventHandler.ProcessNextEvent(current);
 		}
 
 		#region StateBuilder forwarding and help
