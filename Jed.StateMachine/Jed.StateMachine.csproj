@@ -41,10 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EventProcessor.cs" />
-    <Compile Include="EventInstance.cs" />
     <Compile Include="GuardedTransition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DefaultEventEntryInstance.cs" />
+    <Compile Include="RootState.cs" />
     <Compile Include="State.cs" />
     <Compile Include="StateActions.cs" />
     <Compile Include="StateBuilder.cs" />
@@ -54,7 +53,6 @@
     <Compile Include="ThreadSafeQueue.cs" />
     <Compile Include="Transition.cs" />
     <Compile Include="TransitionDirector.cs" />
-    <Compile Include="TransitionInstance.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

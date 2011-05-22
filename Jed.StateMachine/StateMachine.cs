@@ -8,15 +8,16 @@ namespace Jed.StateMachine
     public class StateMachine
     {
 		internal static readonly object DefaultEntryEvent = new object();
+		internal static readonly object TimeoutEvent = new object();
 
     	private State current;
-    	private State root;
+    	private RootState root;
     	private StateBuilder rootBuilder;
     	private EventProcessor eventHandler;
 
 		public StateMachine()
 		{
-			root = new State("Root", null);
+			root = new RootState(this);
 			rootBuilder = new StateBuilder(this, root);
 			eventHandler = new EventProcessor();
 		}
@@ -25,6 +26,8 @@ namespace Jed.StateMachine
 		{ 
 			get { return new StateBuilder(this, root.GetState(idx)); }
 		}
+
+		internal State CurrentState { get { return current; } }
 
 		public bool InState(object state)
 		{
@@ -44,7 +47,7 @@ namespace Jed.StateMachine
 
 		public virtual void PostEvent(object eventToPost)
 		{
-			eventHandler.AddEvent(new EventInstance(eventToPost));
+			eventHandler.AddEvent(eventToPost);
 
 			while (eventHandler.CanProcess)
 				current = eventHandler.ProcessNextEvent(current);

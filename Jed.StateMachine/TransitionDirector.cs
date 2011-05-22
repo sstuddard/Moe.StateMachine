@@ -16,16 +16,16 @@ namespace Jed.StateMachine
 			this.transitions = new List<Transition>();
 		}
 
-		public TransitionInstance AcceptTransition(object eventTarget)
+		public Transition MatchTransition(object eventTarget)
 		{
-			TransitionInstance result = null;
+			Transition result = null;
 			foreach (Transition transition in transitions)
 			{
 				if (transition.Matches(eventTarget))
 				{
 					if (result != null)
 						throw new InvalidOperationException("Multiple states eligible for transition");
-					result = new TransitionInstance(state, transition);
+					result = transition;
 				}
 			}
 			return result;

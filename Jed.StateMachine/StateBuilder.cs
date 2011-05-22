@@ -16,11 +16,6 @@ namespace Jed.StateMachine
 
 		public object Id { get { return state.Id; } }
 
-		public static implicit operator State(StateBuilder builder)
-		{
-			return builder.state;
-		}
-
 		public StateBuilder DefaultTransition(object targetState)
 		{
 			return TransitionTo(StateMachine.DefaultEntryEvent, targetState);
@@ -35,6 +30,13 @@ namespace Jed.StateMachine
 		public StateBuilder TransitionTo(object eventTarget, object targetState, Func<bool> guard)
 		{
 			state.AddTransition(new GuardedTransition(eventTarget, new StateLocator(targetState, stateMachine), guard));
+			return this;
+		}
+
+		public StateBuilder Timeout(int timeoutInMilliseconds, object targetState)
+		{
+			state.AddTransition(new Transition(StateMachine.TimeoutEvent, new StateLocator(targetState, stateMachine)));
+			//OnEnter()
 			return this;
 		}
 

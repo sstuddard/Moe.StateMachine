@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace Jed.StateMachine
 {
-	public class State
+	internal class State
 	{
 		private State parent;
 		private object id;
 		private Dictionary<object, State> substates;
-		private TransitionDirector transitions;
+		protected TransitionDirector transitions;
 		private StateActions actions;
 
 		internal State(object id, State parent)
@@ -30,19 +30,14 @@ namespace Jed.StateMachine
 			return substates[id];
 		}
 
-		internal void Enter()
+		protected virtual void Enter()
 		{
 			actions.PerformEnter();
 		}
 
-		internal void Exit()
+		protected virtual void Exit()
 		{
 			actions.PerformExit();
-		}
-
-		internal TransitionInstance EvaluateEvent(object eventToReceive)
-		{
-			return transitions.AcceptTransition(eventToReceive);
 		}
 
 		internal void AddTransition(Transition transition)
@@ -58,6 +53,46 @@ namespace Jed.StateMachine
 		public void AddExitAction(Action<object> action)
 		{
 			actions.AddExit(action);
+		}
+
+		public virtual State ProcessEvent(object eventToProcess)
+		{
+			Transition transition = transitions.MatchTransition(eventToProcess);
+			if (transition != null)
+				return Traverse(transition);
+
+			return parent.ProcessEvent(eventToProcess);
+		}
+
+		internal virtual State Traverse(Transition transition)
+		{
+			// Have we arrived?
+			if (transition.TargetState.Equals(this))
+			{
+				Enter();
+				return DispatchDefaults();
+			}
+
+			// Traverse down to children?
+			foreach (State substate in substates.Values)
+			{
+				if (substate.ContainsState(transition.TargetState.Id))
+				{
+					Enter();
+					return substate.Traverse(transition);
+				}
+			}
+
+			Exit();
+			return parent.Traverse(transition);
+		}
+
+		internal virtual State DispatchDefaults()
+		{
+			if (transitions.MatchTransition(StateMachine.DefaultEntryEvent) != null)
+				return ProcessEvent(StateMachine.DefaultEntryEvent);
+
+			return this;
 		}
 	}
 }
