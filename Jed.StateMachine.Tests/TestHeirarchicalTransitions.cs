@@ -40,18 +40,19 @@ namespace Jed.StateMachine.Tests
 			Assert.IsTrue(sm.InState(States.GreenChild));
 		}
 
-		//[Test]
-		//public void Test_Transition_ToSuperstateWithDefault()
-		//{
-		//    StateMachine sm = new StateMachine();
-		//    sm.AddState(States.GreenParent).InitialState()
-		//        .AddState(States.GreenChild).InitialState();
-		//    sm.AddState(States.RedParent);
+		[Test]
+		public void Test_Transition_ToSuperstateWithDefault()
+		{
+			StateMachine sm = new StateMachine();
+			sm.AddState(States.GreenParent)
+				.AddState(States.GreenChild).InitialState();
+			sm.AddState(States.RedParent).TransitionTo(Events.Change, States.GreenParent).InitialState();
 
-		//    sm.Start();
+			sm.Start();
 
-		//    Assert.IsTrue(sm.InState(States.GreenParent));
-		//    Assert.IsTrue(sm.InState(States.GreenChild));
-		//}
+			Assert.IsTrue(sm.InState(States.RedParent));
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.GreenChild));
+		}
 	}
 }

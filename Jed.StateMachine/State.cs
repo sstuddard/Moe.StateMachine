@@ -42,12 +42,11 @@ namespace Jed.StateMachine
 
 		internal TransitionInstance EvaluateEvent(object eventToReceive)
 		{
-			TransitionInstance transition = null;
 			Transition matching = transitions.FindTransition(eventToReceive);
 			if (matching != null)
-				transition = new TransitionInstance(this, matching);
+				return new TransitionInstance(this, matching);
 
-			return transition;
+			return null;
 		}
 
 		internal void AddTransition(Transition transition)
