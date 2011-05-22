@@ -22,7 +22,7 @@ namespace Jed.StateMachine.Tests
 
 		public enum Events
 		{
-			WalkButtonPushed,
+			PanicButton,
 			Change
 		}
 
@@ -60,6 +60,32 @@ namespace Jed.StateMachine.Tests
 			sm.PostEvent(Events.Change);
 
 			Assert.IsTrue(sm.InState(States.Yellow));
+		}
+
+		[Test]
+		public void Test_Transitions_MultiTransitionFromState()
+		{
+			StateMachine sm = new StateMachine();
+			sm.AddState(States.Green)
+				.TransitionTo(Events.Change, States.Yellow)
+				.TransitionTo(Events.PanicButton, States.Red)
+				.InitialState();
+			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
+			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+
+			sm.Start();
+
+			Assert.IsTrue(sm.InState(States.Green));
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.Yellow));
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.Red));
+			sm.PostEvent(Events.PanicButton);
+			Assert.IsTrue(sm.InState(States.Red));
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.Green));
+			sm.PostEvent(Events.PanicButton);
+			Assert.IsTrue(sm.InState(States.Red));
 		}
 
 		[Test]

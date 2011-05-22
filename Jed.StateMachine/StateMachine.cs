@@ -42,19 +42,46 @@ namespace Jed.StateMachine
 
 		public virtual void PostEvent(object eventToPost)
 		{
+			PostEventFull(eventToPost);
+		}
+
+		private void PostEventShallow(object eventToPost)
+		{
+			TransitionInstance transition = current.EvaluateEvent(eventToPost);
+			PerformTransition(transition);
+		}
+
+		private void PostEventFull(object eventToPost)
+		{
 			TransitionInstance transition = null;
 			current.VisitParentChain(s =>
-				{
-					TransitionInstance found = s.EvaluateEvent(eventToPost);
-					if (found != null && transition != null)
-						throw new InvalidOperationException("Multiple transitions found.");
+			{
+				TransitionInstance found = s.EvaluateEvent(eventToPost);
+				if (found != null && transition == null)
+					transition = found;
+			});
 
-					transition = found ?? transition;
-				});
+			PerformTransition(transition);
+		}
 
+		private void PerformTransition(TransitionInstance transition)
+		{
 			// Perform state transition
 			if (transition != null)
+			{
 				current = transition.Transition();
+				HandleSuperStateEntry();
+			}
+		}
+
+		private void HandleSuperStateEntry()
+		{
+			State previous;
+			do
+			{
+				previous = current;
+				PostEventShallow(DefaultEntryEvent);
+			} while (current != previous);
 		}
 
 		#region StateBuilder forwarding and help
