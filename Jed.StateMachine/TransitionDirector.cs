@@ -29,9 +29,9 @@ namespace Jed.StateMachine
 			return result;
 		}
 
-		public void AddTransition(object eventTarget, StateLocator targetState)
+		public void AddTransition(Transition transition)
 		{
-			transitions.Add(new Transition(eventTarget, targetState));
+			transitions.Add(transition);
 		}
 	}
 }

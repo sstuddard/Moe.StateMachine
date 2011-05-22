@@ -50,9 +50,9 @@ namespace Jed.StateMachine
 			return transition;
 		}
 
-		internal void AddTransition(object eventTarget, StateLocator targetState)
+		internal void AddTransition(Transition transition)
 		{
-			transitions.AddTransition(eventTarget, targetState);
+			transitions.AddTransition(transition);
 		}
 
 		public void AddEnterAction(Action<object> action)

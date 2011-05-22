@@ -105,6 +105,26 @@ namespace Jed.StateMachine.Tests
 			Assert.IsTrue(events[3].Contains("Green"));
 		}
 
+		[Test]
+		public void Test_Transitions_BasicTransitions_Conditional()
+		{
+			StateMachine sm = new StateMachine();
+			bool allow = false;
+			sm.AddState(States.Green).TransitionTo(Events.Change, States.Yellow, () => { return allow; }).InitialState();
+			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
+			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+
+			sm.Start();
+
+			// Transition should not go
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.Green));
+
+			allow = true;
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.Yellow));
+		}
+
 		private void OnEnter(object stateEntered)
 		{
 			events.Add("Enter: " + stateEntered.ToString());

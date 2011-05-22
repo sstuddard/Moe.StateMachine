@@ -28,7 +28,13 @@ namespace Jed.StateMachine
 
 		public StateBuilder TransitionTo(object eventTarget, object targetState)
 		{
-			state.AddTransition(eventTarget, new StateLocator(targetState, stateMachine));
+			state.AddTransition(new Transition(eventTarget, new StateLocator(targetState, stateMachine)));
+			return this;
+		}
+
+		public StateBuilder TransitionTo(object eventTarget, object targetState, Func<bool> guard)
+		{
+			state.AddTransition(new GuardedTransition(eventTarget, new StateLocator(targetState, stateMachine), guard));
 			return this;
 		}
 

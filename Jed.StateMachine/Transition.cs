@@ -18,7 +18,7 @@ namespace Jed.StateMachine
 
 		public State TargetState { get { return targetState; } }
 
-		public bool Matches(object eventToMatch)
+		public virtual bool Matches(object eventToMatch)
 		{
 			return eventTarget.Equals(eventToMatch);
 		}
