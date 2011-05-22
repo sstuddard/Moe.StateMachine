@@ -16,7 +16,7 @@ namespace Jed.StateMachine
 			this.transitions = new List<Transition>();
 		}
 
-		public Transition MatchTransition(object eventTarget)
+		public Transition MatchTransition(EventInstance eventTarget)
 		{
 			Transition result = null;
 			foreach (Transition transition in transitions)

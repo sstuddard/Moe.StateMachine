@@ -11,16 +11,16 @@ namespace Jed.StateMachine
 		private const int NotProcessing = 0;
 		private const int Processing = 1;
 
-		private ThreadSafeQueue<object> events;
+		private ThreadSafeQueue<EventInstance> events;
 		private int processingIndicator;
 
 		public EventProcessor()
 		{
-			events = new ThreadSafeQueue<object>();
+			events = new ThreadSafeQueue<EventInstance>();
 			processingIndicator = NotProcessing;
 		}
 
-		public void AddEvent(object eventToAdd)
+		public void AddEvent(EventInstance eventToAdd)
 		{
 			events.Enqueue(eventToAdd);
 		}
@@ -37,7 +37,7 @@ namespace Jed.StateMachine
 			// Processing should not be re-entrant, on the same thread or otherwise
 			if (NotProcessing == Interlocked.CompareExchange(ref processingIndicator, Processing, NotProcessing))
 			{
-				object eventToProcess = events.Dequeue();
+				EventInstance eventToProcess = events.Dequeue();
 				if (eventToProcess != null)
 					currentState = currentState.ProcessEvent(eventToProcess);
 

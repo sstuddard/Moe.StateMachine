@@ -23,20 +23,34 @@ namespace Jed.StateMachine
 
 		public StateBuilder TransitionTo(object eventTarget, object targetState)
 		{
-			state.AddTransition(new Transition(eventTarget, new StateLocator(targetState, stateMachine)));
+			state.AddTransition(new Transition(state, eventTarget, new StateLocator(targetState, stateMachine)));
 			return this;
 		}
 
 		public StateBuilder TransitionTo(object eventTarget, object targetState, Func<bool> guard)
 		{
-			state.AddTransition(new GuardedTransition(eventTarget, new StateLocator(targetState, stateMachine), guard));
+			state.AddTransition(new GuardedTransition(state, eventTarget, new StateLocator(targetState, stateMachine), guard));
 			return this;
 		}
 
 		public StateBuilder Timeout(int timeoutInMilliseconds, object targetState)
 		{
-			state.AddTransition(new Transition(StateMachine.TimeoutEvent, new StateLocator(targetState, stateMachine)));
-			//OnEnter()
+			Transition timeout = new Transition(state, StateMachine.TimeoutEvent, new StateLocator(targetState, stateMachine));
+			return Timeout(timeoutInMilliseconds, timeout);
+		}
+
+		public StateBuilder Timeout(int timeoutInMilliseconds, object targetState, Func<bool> guard)
+		{
+			Transition timeout = 
+				new GuardedTransition(state, StateMachine.TimeoutEvent, new StateLocator(targetState, stateMachine), guard);
+			return Timeout(timeoutInMilliseconds, timeout);
+		}
+
+		private StateBuilder Timeout(int timeoutInMilliseconds, Transition transition)
+		{
+			state.AddTransition(transition);
+			OnEnter(s => stateMachine.RegisterTimer(state, DateTime.Now.AddMilliseconds(timeoutInMilliseconds)));
+			OnExit(s => stateMachine.RemoveTimer(state));
 			return this;
 		}
 

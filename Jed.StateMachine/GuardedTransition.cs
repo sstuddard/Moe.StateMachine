@@ -9,13 +9,13 @@ namespace Jed.StateMachine
 	{
 		private Func<bool> guard;
 
-		public GuardedTransition(object eventTarget, StateLocator targetState, Func<bool> guard)
-			: base(eventTarget, targetState)
+		public GuardedTransition(State sourceState, object eventTarget, StateLocator targetState, Func<bool> guard)
+			: base(sourceState, eventTarget, targetState)
 		{
 			this.guard = guard;
 		}
 
-		public override bool Matches(object eventToMatch)
+		public override bool Matches(EventInstance eventToMatch)
 		{
 			return base.Matches(eventToMatch) && guard();
 		}

@@ -55,7 +55,24 @@ namespace Jed.StateMachine
 			actions.AddExit(action);
 		}
 
-		public virtual State ProcessEvent(object eventToProcess)
+		public override bool Equals(object obj)
+		{
+			if (obj is State)
+				return ((State) obj).Id.Equals(this.Id);
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			return id.GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			return "[State: " + id.ToString() + "]";
+		}
+
+		public virtual State ProcessEvent(EventInstance eventToProcess)
 		{
 			Transition transition = transitions.MatchTransition(eventToProcess);
 			if (transition != null)
@@ -89,8 +106,9 @@ namespace Jed.StateMachine
 
 		internal virtual State DispatchDefaults()
 		{
-			if (transitions.MatchTransition(StateMachine.DefaultEntryEvent) != null)
-				return ProcessEvent(StateMachine.DefaultEntryEvent);
+			var defaultTransition = new SingleStateEventInstance(this, StateMachine.DefaultEntryEvent);
+			if (transitions.MatchTransition(defaultTransition) != null)
+				return ProcessEvent(defaultTransition);
 
 			return this;
 		}

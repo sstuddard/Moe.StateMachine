@@ -18,7 +18,8 @@ namespace Jed.StateMachine.Tests
 
 		public enum Events
 		{
-			Change
+			Change,
+			Pulse
 		}
 
 		[Test]
@@ -53,7 +54,7 @@ namespace Jed.StateMachine.Tests
 
 			Assert.IsTrue(sm.InState(States.Green));
 			System.Threading.Thread.Sleep(110);
-			sm.PostEvent(Events.Change);
+			sm.PostEvent(Events.Pulse);
 			Assert.IsTrue(sm.InState(States.Red));
 		}
 
@@ -61,6 +62,12 @@ namespace Jed.StateMachine.Tests
 		public void Test_TimeoutEvent_TimeoutClearsOnExitState()
 		{
 			
+		}
+
+		[Test]
+		public void Test_ConditionalTimeoutEvent_TimeoutClearsAfterFailedEval()
+		{
+
 		}
 
 		[Test]

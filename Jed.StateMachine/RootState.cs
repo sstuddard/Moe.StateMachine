@@ -20,7 +20,7 @@ namespace Jed.StateMachine
 		/// </summary>
 		/// <param name="eventToProcess"></param>
 		/// <returns></returns>
-		public override State ProcessEvent(object eventToProcess)
+		public override State ProcessEvent(EventInstance eventToProcess)
 		{
 			Transition transition = transitions.MatchTransition(eventToProcess);
 			if (transition != null)
