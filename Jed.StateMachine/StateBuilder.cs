@@ -44,6 +44,12 @@ namespace Jed.StateMachine
 			return this;
 		}
 
+		public StateBuilder OnExit(Action<object> action)
+		{
+			state.AddExitAction(action);
+			return this;
+		}
+
 		public StateBuilder AddState(object newState)
 		{
 			if (stateMachine.GetState(newState) != null)

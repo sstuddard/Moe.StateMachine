@@ -9,11 +9,11 @@ namespace Jed.StateMachine
 		private object id;
 		private Dictionary<object, State> substates;
 		private TransitionDirector transitions;
-		private List<Action<object>> enterActions;
+		private StateActions actions;
 
 		internal State(object id, State parent)
 		{
-			this.enterActions = new List<Action<object>>();
+			this.actions = new StateActions(this);
 			this.substates = new Dictionary<object, State>();
 			this.id = id;
 			this.transitions = new TransitionDirector();
@@ -32,12 +32,12 @@ namespace Jed.StateMachine
 
 		internal void Enter()
 		{
-			foreach (Action<object> enterAction in enterActions)
-				enterAction(Id);
+			actions.PerformEnter();
 		}
 
 		internal void Exit()
 		{
+			actions.PerformExit();
 		}
 
 		internal TransitionInstance EvaluateEvent(object eventToReceive)
@@ -57,7 +57,12 @@ namespace Jed.StateMachine
 
 		public void AddEnterAction(Action<object> action)
 		{
-			enterActions.Add(action);
+			actions.AddEnter(action);
+		}
+
+		public void AddExitAction(Action<object> action)
+		{
+			actions.AddExit(action);
 		}
 	}
 }

@@ -84,9 +84,35 @@ namespace Jed.StateMachine.Tests
 			Assert.IsTrue(events[4].Contains("Yellow"));
 		}
 
+		[Test]
+		public void Test_Transitions_BasicTransitions_ExitActions()
+		{
+			StateMachine sm = new StateMachine();
+			sm.AddState(States.Green).OnExit(OnExit).TransitionTo(Events.Change, States.Yellow).InitialState();
+			sm.AddState(States.Yellow).OnExit(OnExit).TransitionTo(Events.Change, States.Red);
+			sm.AddState(States.Red).OnExit(OnExit).TransitionTo(Events.Change, States.Green);
+
+			sm.Start();
+
+			sm.PostEvent(Events.Change);
+			sm.PostEvent(Events.Change);
+			sm.PostEvent(Events.Change);
+			sm.PostEvent(Events.Change);
+
+			Assert.IsTrue(events[0].Contains("Green"));
+			Assert.IsTrue(events[1].Contains("Yellow"));
+			Assert.IsTrue(events[2].Contains("Red"));
+			Assert.IsTrue(events[3].Contains("Green"));
+		}
+
 		private void OnEnter(object stateEntered)
 		{
 			events.Add("Enter: " + stateEntered.ToString());
+		}
+
+		private void OnExit(object stateEntered)
+		{
+			events.Add("Exit: " + stateEntered.ToString());
 		}
 	}
 }
