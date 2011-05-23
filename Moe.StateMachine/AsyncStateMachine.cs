@@ -69,10 +69,15 @@ namespace Moe.StateMachine
 			}
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
-			stateThread.Abort();
-			stateThread.Join();
+			base.Dispose();
+
+			if (stateThread != null)
+			{
+				stateThread.Abort();
+				stateThread.Join();
+			}
 		}
 	}
 }

@@ -61,8 +61,13 @@ namespace Moe.StateMachine.Sample
 
 		private void btnExit_Click(object sender, EventArgs e)
 		{
-			stateMachine.Dispose();
 			Close();
+		}
+
+		protected override void OnClosed(EventArgs e)
+		{
+			stateMachine.Dispose();
+			base.OnClosed(e);
 		}
 
 		private void btnChange_Click(object sender, EventArgs e)
