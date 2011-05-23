@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Jed.StateMachine
 {
-	internal static class StateExtensions
+	public static class StateExtensions
 	{
 		public static void VisitChildren(this State s, Action<State> action)
 		{

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Jed.StateMachine
 {
-	internal class State
+	public class State
 	{
 		private State parent;
 		private object id;

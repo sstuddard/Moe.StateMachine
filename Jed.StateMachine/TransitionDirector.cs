@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Jed.StateMachine
 {
-	internal class TransitionDirector
+	public class TransitionDirector
 	{
 		private State state;
 		private List<Transition> transitions;

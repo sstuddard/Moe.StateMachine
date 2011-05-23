@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Jed.StateMachine
 {
-	internal class Transition
+	public class Transition
 	{
 		private State sourceState;
 		private object eventTarget;

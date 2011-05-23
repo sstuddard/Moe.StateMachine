@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Jed.StateMachine
 {
-	internal class GuardedTransition : Transition
+	public class GuardedTransition : Transition
 	{
 		private Func<bool> guard;
 

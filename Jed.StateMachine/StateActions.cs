@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Jed.StateMachine
 {
-	internal class StateActions
+	public class StateActions
 	{
 		private enum ActionType
 		{

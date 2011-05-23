@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Jed.StateMachine
 {
-	internal class TimerManager
+	public class TimerManager
 	{
 		private List<StateTimePair> timers;
 		
@@ -43,6 +43,18 @@ namespace Jed.StateMachine
 				}
 
 				return null;
+			}
+		}
+
+		public TimeSpan GetTimeToNextTimeout()
+		{
+			lock (timers)
+			{
+				var timer = timers.FirstOrDefault();
+				if (timer != null)
+					return timer.Time - DateTime.Now;
+
+				return TimeSpan.FromDays(1);
 			}
 		}
 

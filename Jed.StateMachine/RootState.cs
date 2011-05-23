@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Jed.StateMachine
 {
-	internal class RootState : State
+	public class RootState : State
 	{
 		private StateMachine stateMachine;
 

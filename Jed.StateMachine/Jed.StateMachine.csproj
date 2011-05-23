@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncStateMachine.cs" />
     <Compile Include="TimerManager.cs" />
     <Compile Include="EventInstance.cs" />
     <Compile Include="EventProcessor.cs" />

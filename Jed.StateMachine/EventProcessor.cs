@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace Jed.StateMachine
 {
-	internal class EventProcessor
+	public class EventProcessor
 	{
 		private const int NotProcessing = 0;
 		private const int Processing = 1;

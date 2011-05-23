@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Jed.StateMachine
 {
-	internal class SingleStateEventInstance : EventInstance
+	public class SingleStateEventInstance : EventInstance
 	{
 		private State targetState;
 		

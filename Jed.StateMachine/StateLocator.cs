@@ -8,7 +8,7 @@ namespace Jed.StateMachine
 	/// <summary>
 	/// Lazy resolution of states
 	/// </summary>
-	internal class StateLocator
+	public class StateLocator
 	{
 		private object stateId;
 		private StateMachine stateMachine;
