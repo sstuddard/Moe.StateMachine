@@ -106,11 +106,7 @@ namespace Jed.StateMachine
 
 		internal virtual State DispatchDefaults()
 		{
-			var defaultTransition = new SingleStateEventInstance(this, StateMachine.DefaultEntryEvent);
-			if (transitions.MatchTransition(defaultTransition) != null)
-				return ProcessEvent(this, defaultTransition);
-
-			return this;
+			return ProcessEvent(this, new SingleStateEventInstance(this, StateMachine.DefaultEntryEvent));
 		}
 	}
 }
