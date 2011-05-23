@@ -121,7 +121,10 @@ namespace Jed.StateMachine.Tests
 
 			Assert.IsTrue(sm.InState(States.Green));
 			System.Threading.Thread.Sleep(210);
-			sm.PostEvent(Events.Pulse);
+
+			// Pulse twice
+			sm.Pulse();
+			sm.Pulse();
 			Assert.IsTrue(sm.InState(States.Red));
 		}
 

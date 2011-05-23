@@ -9,6 +9,7 @@ namespace Jed.StateMachine
     {
 		public static readonly object DefaultEntryEvent = "DefaultEntry";
 		public static readonly object TimeoutEvent = "Timeout";
+    	public static readonly object PulseEvent = "Pulse";
 
     	protected State current;
 		protected RootState root;
@@ -42,9 +43,14 @@ namespace Jed.StateMachine
 
     	public virtual void Start()
     	{
-    		current = root.ProcessEvent(new SingleStateEventInstance(root, DefaultEntryEvent));
+    		current = root.ProcessEvent(root, new SingleStateEventInstance(root, DefaultEntryEvent));
 			if (current == null || current == root)
 				throw new InvalidOperationException("No initial state found.");
+		}
+
+		public virtual void Pulse()
+		{
+			PostEvent(PulseEvent);
 		}
 
 		public virtual void PostEvent(object eventToPost)

@@ -20,13 +20,13 @@ namespace Jed.StateMachine
 		/// </summary>
 		/// <param name="eventToProcess"></param>
 		/// <returns></returns>
-		public override State ProcessEvent(EventInstance eventToProcess)
+		public override State ProcessEvent(State sourceState, EventInstance eventToProcess)
 		{
 			Transition transition = transitions.MatchTransition(eventToProcess);
 			if (transition != null)
 				return Traverse(transition);
 
-			return this.stateMachine.CurrentState;
+			return sourceState;
 		}
 
 		/// <summary>
@@ -34,14 +34,13 @@ namespace Jed.StateMachine
 		/// </summary>
 		/// <param name="transition"></param>
 		/// <returns></returns>
-		internal override State Traverse(Transition transition)
+		protected internal override State Traverse(Transition transition)
 		{
 			// Traverse down to children?
 			foreach (State substate in Substates)
 			{
 				if (substate.ContainsState(transition.TargetState.Id))
 				{
-					Enter();
 					return substate.Traverse(transition);
 				}
 			}

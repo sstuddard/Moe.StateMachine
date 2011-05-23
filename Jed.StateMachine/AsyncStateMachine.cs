@@ -8,7 +8,6 @@ namespace Jed.StateMachine
 {
 	public class AsyncStateMachine : StateMachine, IDisposable
 	{
-		private StateMachine sm;
 		private Thread stateThread;
 		private AutoResetEvent eventsQueued;
 

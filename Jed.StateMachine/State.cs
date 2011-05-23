@@ -72,16 +72,16 @@ namespace Jed.StateMachine
 			return "[State: " + id.ToString() + "]";
 		}
 
-		public virtual State ProcessEvent(EventInstance eventToProcess)
+		public virtual State ProcessEvent(State sourceState, EventInstance eventToProcess)
 		{
 			Transition transition = transitions.MatchTransition(eventToProcess);
 			if (transition != null)
 				return Traverse(transition);
 
-			return parent.ProcessEvent(eventToProcess);
+			return parent.ProcessEvent(sourceState, eventToProcess);
 		}
 
-		internal virtual State Traverse(Transition transition)
+		protected internal virtual State Traverse(Transition transition)
 		{
 			// Have we arrived?
 			if (transition.TargetState.Equals(this))
@@ -108,7 +108,7 @@ namespace Jed.StateMachine
 		{
 			var defaultTransition = new SingleStateEventInstance(this, StateMachine.DefaultEntryEvent);
 			if (transitions.MatchTransition(defaultTransition) != null)
-				return ProcessEvent(defaultTransition);
+				return ProcessEvent(this, defaultTransition);
 
 			return this;
 		}

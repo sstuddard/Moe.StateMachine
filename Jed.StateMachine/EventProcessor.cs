@@ -39,7 +39,7 @@ namespace Jed.StateMachine
 			{
 				EventInstance eventToProcess = events.Dequeue();
 				if (eventToProcess != null)
-					currentState = currentState.ProcessEvent(eventToProcess);
+					currentState = currentState.ProcessEvent(currentState, eventToProcess);
 
 				processingIndicator = NotProcessing;
 			}
