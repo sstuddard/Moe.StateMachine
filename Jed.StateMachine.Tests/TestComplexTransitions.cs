@@ -28,6 +28,46 @@ namespace Jed.StateMachine.Tests
 		}
 
 		[Test]
+		public void Test_MultipleGuardedTransitions()
+		{
+			StateMachine sm = new StateMachine();
+			bool flag = false;
+			sm.AddState(States.Green)
+				.TransitionTo(Events.Change, States.Yellow, () => flag)
+				.TransitionTo(Events.Change, States.Red, () => !flag)
+				.InitialState();
+			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Green);
+			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+
+			sm.Start();
+
+			Assert.IsTrue(sm.InState(States.Green));
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.Red));
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.Green));
+			flag = true;
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.Yellow));
+		}
+
+		[Test]
+		public void Test_MultipleGuardedDefaultTransitions()
+		{
+			StateMachine sm = new StateMachine();
+			bool flag = false;
+			sm.DefaultTransition(States.Green, () => flag);
+			sm.DefaultTransition(States.Red, () => !flag);
+			sm.AddState(States.Green);
+			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Green);
+			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+
+			sm.Start();
+
+			Assert.IsTrue(sm.InState(States.Red));
+		}
+
+		[Test]
 		public void Test_ReentrantEventPosting()
 		{
 			StateMachine sm = new StateMachine();

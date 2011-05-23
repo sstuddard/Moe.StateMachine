@@ -92,6 +92,11 @@ namespace Jed.StateMachine
 			return rootBuilder.DefaultTransition(targetState);
 		}
 
+		public StateBuilder DefaultTransition(object targetState, Func<bool> guard)
+		{
+			return rootBuilder.DefaultTransition(targetState, guard);
+		}
+
 		internal State GetState(object identifier)
 		{
 			return root.GetState(identifier);

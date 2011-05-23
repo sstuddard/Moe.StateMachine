@@ -116,5 +116,13 @@ namespace Jed.StateMachine.Tests
 
 			Assert.AreEqual(sm[States.GreenChild].Id, States.GreenChild);
 		}
+
+		[Test]
+		public void Test_State_CreateDeepByIndexers()
+		{
+			StateMachine sm = new StateMachine();
+			sm[States.Green][States.GreenChild][States.Red].InitialState();
+			Assert.IsNotNull(sm[States.Green][States.GreenChild][States.Red].Id);
+		}
 	}
 }
