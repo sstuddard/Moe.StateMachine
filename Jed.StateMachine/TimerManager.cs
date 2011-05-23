@@ -7,39 +7,55 @@ namespace Jed.StateMachine
 {
 	internal class TimerManager
 	{
-		private Dictionary<State, DateTime> timers;
-
+		private List<StateTimePair> timers;
+		
 		public TimerManager()
 		{
-			timers = new Dictionary<State, DateTime>();
+			timers = new List<StateTimePair>();
 		}
 
 		public void SetTimer(State state, DateTime timeout)
 		{
-			timers[state] = timeout;
+			lock (timers)
+			{
+				timers.Add(new StateTimePair(state, timeout));
+				timers.Sort((a, b) => a.Time.CompareTo(b.Time));
+			}
 		}
 
 		public void ClearTimer(State state)
 		{
-			if (timers.ContainsKey(state))
-				timers.Remove(state);
+			lock (timers)
+			{
+				timers.RemoveAll(stp => stp.State.Equals(state));
+			}
 		}
 
 		public State GetNextStateTimeout()
 		{
-			State earliest = null;
-			foreach (State state in timers.Keys)
+			lock (timers)
 			{
-				if (earliest == null)
-					earliest = state;
-				else
+				var timer = timers.FirstOrDefault();
+				if (timer != null && timer.Time < DateTime.Now)
 				{
-					if (timers[state] < timers[earliest])
-						earliest = state;
+					timers.Remove(timer);
+					return timer.State;
 				}
-			}
 
-			return earliest;
+				return null;
+			}
+		}
+
+		private class StateTimePair
+		{
+			public State State { get; private set; }
+			public DateTime Time { get; private set; }
+
+			public StateTimePair(State state, DateTime time)
+			{
+				this.State = state;
+				this.Time = time;
+			}
 		}
 	}
 }

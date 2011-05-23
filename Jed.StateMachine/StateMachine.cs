@@ -26,7 +26,7 @@ namespace Jed.StateMachine
 
     	public StateBuilder this[object idx] 
 		{ 
-			get { return new StateBuilder(this, root.GetState(idx)); }
+			get { return rootBuilder[idx]; }
 		}
 
 		internal State CurrentState { get { return current; } }
@@ -68,8 +68,8 @@ namespace Jed.StateMachine
 
 		protected virtual void UpdateTimers()
 		{
-			State timeout = timers.GetNextStateTimeout();
-			if (timeout != null)
+			State timeout = null;
+			while ((timeout = timers.GetNextStateTimeout()) != null)
 				eventHandler.AddEvent(new SingleStateEventInstance(timeout, TimeoutEvent));
 		}
 

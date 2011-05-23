@@ -16,6 +16,16 @@ namespace Jed.StateMachine
 
 		public object Id { get { return state.Id; } }
 
+		public StateBuilder this[object idx]
+		{
+			get
+			{
+				if (!state.ContainsState(idx))
+					AddState(idx);
+				return new StateBuilder(stateMachine, state.GetState(idx));
+			}
+		}
+
 		public StateBuilder DefaultTransition(object targetState)
 		{
 			return TransitionTo(StateMachine.DefaultEntryEvent, targetState);
