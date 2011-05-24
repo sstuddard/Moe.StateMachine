@@ -11,22 +11,6 @@ namespace Moe.StateMachine.Tests
 	{
 		private List<string> events;
 
-		public enum States
-		{
-			GreenParent,
-			GreenChild,
-			GreenGrandChild,
-			RedParent,
-			RedChild,
-			Yellow
-		}
-
-		public enum Events
-		{
-			Panic,
-			Change
-		}
-
 		[SetUp]
 		public void Setup()
 		{

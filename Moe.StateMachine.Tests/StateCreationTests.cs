@@ -11,18 +11,6 @@ namespace Moe.StateMachine.Tests
 	[TestFixture]
     public class TestStateCreation
     {
-		public enum States
-		{
-			Green,
-			Red,
-			GreenChild
-		}
-
-		public enum Events
-		{
-			Change
-		}
-
 		[Test]
         public void Test_Create_SimpleMachine()
         {
@@ -123,6 +111,17 @@ namespace Moe.StateMachine.Tests
 			StateMachine sm = new StateMachine();
 			sm[States.Green][States.GreenChild][States.Red].InitialState();
 			Assert.IsNotNull(sm[States.Green][States.GreenChild][States.Red].Id);
+		}
+
+		[Test]
+		public void Test_ShortCircuitIndexer_CreatesState()
+		{
+			StateMachine sm = new StateMachine();
+			Assert.IsNotNull(sm[States.Green]);
+			Assert.IsNotNull(sm[States.Green][States.GreenChild]);
+			Assert.IsNotNull(sm[States.Yellow]);
+
+			Assert.IsNotNull(sm[States.GreenChild]);
 		}
 	}
 }

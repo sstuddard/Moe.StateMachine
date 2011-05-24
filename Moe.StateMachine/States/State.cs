@@ -69,37 +69,46 @@ namespace Moe.StateMachine.States
 		{
 			Transition transition = transitions.MatchTransition(eventToProcess);
 			if (transition != null)
-				return Traverse(new TransitionEvent(transition, eventToProcess));
+				return TraverseUp(new TransitionEvent(transition, eventToProcess));
 
 			return parent.ProcessEvent(sourceState, eventToProcess);
 		}
 
 		public virtual State Accept(TransitionEvent transitionEvent)
 		{
-			return Traverse(transitionEvent);
-		}
-
-		protected virtual State Traverse(TransitionEvent transition)
-		{
 			// Have we arrived?
-			if (transition.TargetState.Equals(this))
+			if (transitionEvent.TargetState.Equals(this))
 			{
-				Enter(transition);
+				Enter(transitionEvent);
 				return DispatchDefaults();
 			}
 
+			if (this.ContainsState(transitionEvent.TargetState.Id))
+				return TraverseDown(transitionEvent);
+
+			return TraverseUp(transitionEvent);
+		}
+
+		protected virtual State TraverseDown(TransitionEvent transitionEvent)
+		{
 			// Traverse down to children?
 			foreach (State substate in substates.Values)
 			{
-				if (substate.ContainsState(transition.TargetState.Id))
+				if (substate.ContainsState(transitionEvent.TargetState.Id))
 				{
-					Enter(transition);
-					return substate.Accept(transition);
+					Enter(transitionEvent);
+					return substate.Accept(transitionEvent);
 				}
 			}
 
-			Exit(transition);
-			return parent.Accept(transition);
+			// Definitely, should never happen.
+			throw new InvalidOperationException("Transition got lost in traversal");
+		}
+
+		protected virtual State TraverseUp(TransitionEvent transitionEvent)
+		{
+			Exit(transitionEvent);
+			return parent.Accept(transitionEvent);
 		}
 
 		internal virtual State DispatchDefaults()

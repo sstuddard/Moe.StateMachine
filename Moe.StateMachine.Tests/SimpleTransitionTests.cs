@@ -12,20 +12,6 @@ namespace Moe.StateMachine.Tests
 	{
 		private List<string> events;
 
-		public enum States
-		{
-			Green,
-			Red,
-			Yellow,
-			GreenChild
-		}
-
-		public enum Events
-		{
-			PanicButton,
-			Change
-		}
-
 		[SetUp]
 		public void Setup()
 		{
@@ -68,7 +54,7 @@ namespace Moe.StateMachine.Tests
 			StateMachine sm = new StateMachine();
 			sm.AddState(States.Green)
 				.TransitionTo(Events.Change, States.Yellow)
-				.TransitionTo(Events.PanicButton, States.Red)
+				.TransitionTo(Events.Panic, States.Red)
 				.InitialState();
 			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
 			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
@@ -80,11 +66,11 @@ namespace Moe.StateMachine.Tests
 			Assert.IsTrue(sm.InState(States.Yellow));
 			sm.PostEvent(Events.Change);
 			Assert.IsTrue(sm.InState(States.Red));
-			sm.PostEvent(Events.PanicButton);
+			sm.PostEvent(Events.Panic);
 			Assert.IsTrue(sm.InState(States.Red));
 			sm.PostEvent(Events.Change);
 			Assert.IsTrue(sm.InState(States.Green));
-			sm.PostEvent(Events.PanicButton);
+			sm.PostEvent(Events.Panic);
 			Assert.IsTrue(sm.InState(States.Red));
 		}
 
