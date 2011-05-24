@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Moe.StateMachine.Actions;
 using Moe.StateMachine.Events;
 using Moe.StateMachine.Transitions;
 
@@ -9,10 +10,11 @@ namespace Moe.StateMachine.States
 {
 	public class RootState : State
 	{
+		public const string RootStateId = "Root";
 		private StateMachine stateMachine;
 
 		public RootState(StateMachine stateMachine) 
-			: base("Root", null)
+			: base(RootStateId, null, new StateActions(RootStateId))
 		{
 			this.stateMachine = stateMachine;
 		}

@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Moe.StateMachine.Events;
-using Moe.StateMachine.States;
 using Moe.StateMachine.Transitions;
 
 namespace Moe.StateMachine
 {
 	public class TransitionDirector
 	{
-		private State state;
 		private List<Transition> transitions;
 
-		public TransitionDirector(State state)
+		public TransitionDirector()
 		{
-			this.state = state;
 			this.transitions = new List<Transition>();
 		}
 

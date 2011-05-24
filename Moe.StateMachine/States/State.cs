@@ -12,25 +12,25 @@ namespace Moe.StateMachine.States
 		private object id;
 		private Dictionary<object, State> substates;
 		protected TransitionDirector transitions;
-		private StateActions actions;
+		protected StateActions actions;
 
-		public State(object id, State parent)
+		public State(object id, State parent, StateActions actions)
 		{
-			this.actions = new StateActions(this);
-			this.substates = new Dictionary<object, State>();
 			this.id = id;
-			this.transitions = new TransitionDirector(this);
 			this.parent = parent;
+			this.actions = actions;
+			this.substates = new Dictionary<object, State>();
+			this.transitions = new TransitionDirector();
 		}
 
 		public object Id { get { return id; } }
 		public IEnumerable<State> Substates { get { return substates.Values; } }
 		public State Parent { get { return parent; } }
+		public StateActions Actions { get { return actions; } }
 
-		public State AddChildState(object id)
+		public void AddChildState(State substate)
 		{
-			substates[id] = new State(id, this);
-			return substates[id];
+			substates[substate.Id] = substate;
 		}
 
 		protected virtual void Enter(TransitionEvent transition)
@@ -46,26 +46,6 @@ namespace Moe.StateMachine.States
 		public void AddTransition(Transition transition)
 		{
 			transitions.AddTransition(transition);
-		}
-
-		public void AddEnterAction(Action<object> action)
-		{
-			actions.AddEnter(action);
-		}
-
-		public void AddEnterAction<T>(Action<object,T> action)
-		{
-			actions.AddEnter(action);
-		}
-
-		public void AddExitAction(Action<object> action)
-		{
-			actions.AddExit(action);
-		}
-
-		public void AddExitAction<T>(Action<object,T> action)
-		{
-			actions.AddExit(action);
 		}
 
 		public override bool Equals(object obj)

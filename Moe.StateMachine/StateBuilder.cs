@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Moe.StateMachine.Actions;
 using Moe.StateMachine.States;
 using Moe.StateMachine.Transitions;
 
@@ -9,10 +10,19 @@ namespace Moe.StateMachine
 	{
 		private State state;
 		private StateMachine stateMachine;
+		private StateActions stateActions;
 
-		internal StateBuilder(StateMachine stateMachine, State state)
+		public StateBuilder(StateMachine stateMachine, object stateId, State parent)
+		{
+			this.stateMachine = stateMachine;
+			this.stateActions = new StateActions(stateId);
+			this.state = CreateState(stateId, parent);
+		}
+
+		public StateBuilder(StateMachine stateMachine, State state)
 		{
 			this.state = state;
+			this.stateActions = state.Actions;
 			this.stateMachine = stateMachine;
 		}
 
@@ -28,6 +38,12 @@ namespace Moe.StateMachine
 			}
 		}
 
+		public virtual State CreateState(object stateId, State parent)
+		{
+			return new State(stateId, parent, new StateActions(stateId));
+		}
+
+		#region Builder methods
 		public StateBuilder DefaultTransition(object targetState)
 		{
 			return TransitionTo(StateMachine.DefaultEntryEvent, targetState);
@@ -79,34 +95,38 @@ namespace Moe.StateMachine
 
 		public StateBuilder OnEnter(Action<object> action)
 		{
-			state.AddEnterAction(action);
+			stateActions.AddEnter(action);
 			return this;
 		}
 
 		public StateBuilder OnEnter<T>(Action<object,T> action)
 		{
-			state.AddEnterAction(action);
+			stateActions.AddEnter(action);
 			return this;
 		}
 
 		public StateBuilder OnExit(Action<object> action)
 		{
-			state.AddExitAction(action);
+			stateActions.AddExit(action);
 			return this;
 		}
 
 		public StateBuilder OnExit<T>(Action<object, T> action)
 		{
-			state.AddExitAction(action);
+			stateActions.AddExit(action);
 			return this;
 		}
 
-		public StateBuilder AddState(object newState)
+		public StateBuilder AddState(object newStateId)
 		{
-			if (stateMachine.GetState(newState) != null)
+			if (stateMachine.GetState(newStateId) != null)
 				throw new InvalidOperationException();
 
-			return new StateBuilder(stateMachine, state.AddChildState(newState));
+			State newState = CreateState(newStateId, state);
+			state.AddChildState(newState);
+
+			return new StateBuilder(stateMachine, newState);
 		}
+		#endregion
 	}
 }

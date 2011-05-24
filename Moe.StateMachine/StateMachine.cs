@@ -1,4 +1,5 @@
 ﻿using System;
+using Moe.StateMachine.Actions;
 using Moe.StateMachine.Events;
 using Moe.StateMachine.States;
 
@@ -32,7 +33,7 @@ namespace Moe.StateMachine
 		public RootState RootNode { get { return root; } }
 		public State CurrentState { get { return current; } }
 
-		public bool InState(object state)
+		public virtual bool InState(object state)
 		{
 			bool result = false;
 			if (current != null)

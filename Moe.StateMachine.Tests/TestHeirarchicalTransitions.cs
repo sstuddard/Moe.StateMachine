@@ -84,11 +84,11 @@ namespace Moe.StateMachine.Tests
 			Assert.IsTrue(sm.InState(States.RedParent));
 			Assert.IsTrue(sm.InState(States.RedChild));
 
-			Assert.AreEqual("Exit: [State: GreenGrandChild]", events[0]);
-			Assert.AreEqual("Exit: [State: GreenChild]", events[1]);
-			Assert.AreEqual("Exit: [State: GreenParent]", events[2]);
-			Assert.AreEqual("Enter: [State: RedParent]", events[3]);
-			Assert.AreEqual("Enter: [State: RedChild]", events[4]);
+			Assert.AreEqual("Exit: GreenGrandChild", events[0]);
+			Assert.AreEqual("Exit: GreenChild", events[1]);
+			Assert.AreEqual("Exit: GreenParent", events[2]);
+			Assert.AreEqual("Enter: RedParent", events[3]);
+			Assert.AreEqual("Enter: RedChild", events[4]);
 		}
 
 		private void OnEnter(object stateEntered)
