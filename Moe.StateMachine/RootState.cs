@@ -24,7 +24,7 @@ namespace Moe.StateMachine
 		{
 			Transition transition = transitions.MatchTransition(eventToProcess);
 			if (transition != null)
-				return Traverse(transition);
+				return Traverse(new TransitionEvent(transition, eventToProcess));
 
 			return sourceState;
 		}
@@ -34,14 +34,14 @@ namespace Moe.StateMachine
 		/// </summary>
 		/// <param name="transition"></param>
 		/// <returns></returns>
-		protected internal override State Traverse(Transition transition)
+		protected override State Traverse(TransitionEvent transition)
 		{
 			// Traverse down to children?
 			foreach (State substate in Substates)
 			{
 				if (substate.ContainsState(transition.TargetState.Id))
 				{
-					return substate.Traverse(transition);
+					return substate.Accept(transition);
 				}
 			}
 

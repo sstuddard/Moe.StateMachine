@@ -81,7 +81,19 @@ namespace Moe.StateMachine
 			return this;
 		}
 
+		public StateBuilder OnEnter<T>(Action<object,T> action)
+		{
+			state.AddEnterAction(action);
+			return this;
+		}
+
 		public StateBuilder OnExit(Action<object> action)
+		{
+			state.AddExitAction(action);
+			return this;
+		}
+
+		public StateBuilder OnExit<T>(Action<object, T> action)
 		{
 			state.AddExitAction(action);
 			return this;

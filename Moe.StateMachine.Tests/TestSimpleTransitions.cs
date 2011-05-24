@@ -151,6 +151,43 @@ namespace Moe.StateMachine.Tests
 			Assert.IsTrue(sm.InState(States.Yellow));
 		}
 
+		[Test]
+		public void Test_Transitions_EntryExit_WithContext()
+		{
+			StateMachine sm = new StateMachine();
+			sm.AddState(States.Green)
+				.TransitionTo(Events.Change, States.Yellow)
+				.OnExit<Dictionary<string,string>>(OnEnterExitWithContext)
+				.InitialState();
+			sm.AddState(States.Yellow)
+				.TransitionTo(Events.Change, States.Red);
+			sm.AddState(States.Red)
+				.OnEnter<Dictionary<string, string>>(OnEnterExitWithContext)
+				.TransitionTo(Events.Change, States.Green);
+
+			Dictionary<string, string> context = new Dictionary<string, string>();
+			context["Did"] = "exit";
+
+			sm.Start();
+			sm.PostEvent(Events.Change, context);
+			Assert.IsNotNull(postedContext);
+			Assert.IsTrue(postedContext.ContainsKey("Did"));
+			Assert.AreEqual("exit", postedContext["Did"]);
+
+			postedContext = null;
+			context["Did"] = "enter";
+			sm.PostEvent(Events.Change, context);
+			Assert.IsNotNull(postedContext);
+			Assert.IsTrue(postedContext.ContainsKey("Did"));
+			Assert.AreEqual("enter", postedContext["Did"]);
+		}
+
+		private Dictionary<string, string> postedContext;
+		private void OnEnterExitWithContext(object stateEntered, Dictionary<string, string> context)
+		{
+			postedContext = context;
+		}
+
 		private void OnEnter(object stateEntered)
 		{
 			events.Add("Enter: " + stateEntered.ToString());

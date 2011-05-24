@@ -21,26 +21,26 @@ namespace Moe.StateMachine
 		}
 
 		public object Id { get { return id; } }
-		internal IEnumerable<State> Substates { get { return substates.Values; } }
-		internal State Parent { get { return parent; } }
+		public IEnumerable<State> Substates { get { return substates.Values; } }
+		public State Parent { get { return parent; } }
 
-		internal State AddChildState(object id)
+		public State AddChildState(object id)
 		{
 			substates[id] = new State(id, this);
 			return substates[id];
 		}
 
-		protected virtual void Enter()
+		protected virtual void Enter(TransitionEvent transition)
 		{
-			actions.PerformEnter();
+			actions.PerformEnter(transition.EventInstance);
 		}
 
-		protected virtual void Exit()
+		protected virtual void Exit(TransitionEvent transition)
 		{
-			actions.PerformExit();
+			actions.PerformExit(transition.EventInstance);
 		}
 
-		internal void AddTransition(Transition transition)
+		public void AddTransition(Transition transition)
 		{
 			transitions.AddTransition(transition);
 		}
@@ -50,7 +50,17 @@ namespace Moe.StateMachine
 			actions.AddEnter(action);
 		}
 
+		public void AddEnterAction<T>(Action<object,T> action)
+		{
+			actions.AddEnter(action);
+		}
+
 		public void AddExitAction(Action<object> action)
+		{
+			actions.AddExit(action);
+		}
+
+		public void AddExitAction<T>(Action<object,T> action)
 		{
 			actions.AddExit(action);
 		}
@@ -76,17 +86,22 @@ namespace Moe.StateMachine
 		{
 			Transition transition = transitions.MatchTransition(eventToProcess);
 			if (transition != null)
-				return Traverse(transition);
+				return Traverse(new TransitionEvent(transition, eventToProcess));
 
 			return parent.ProcessEvent(sourceState, eventToProcess);
 		}
 
-		protected internal virtual State Traverse(Transition transition)
+		public virtual State Accept(TransitionEvent transitionEvent)
+		{
+			return Traverse(transitionEvent);
+		}
+
+		protected virtual State Traverse(TransitionEvent transition)
 		{
 			// Have we arrived?
 			if (transition.TargetState.Equals(this))
 			{
-				Enter();
+				Enter(transition);
 				return DispatchDefaults();
 			}
 
@@ -95,13 +110,13 @@ namespace Moe.StateMachine
 			{
 				if (substate.ContainsState(transition.TargetState.Id))
 				{
-					Enter();
-					return substate.Traverse(transition);
+					Enter(transition);
+					return substate.Accept(transition);
 				}
 			}
 
-			Exit();
-			return parent.Traverse(transition);
+			Exit(transition);
+			return parent.Accept(transition);
 		}
 
 		internal virtual State DispatchDefaults()

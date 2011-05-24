@@ -28,6 +28,49 @@ namespace Moe.StateMachine.Tests
 		}
 
 		[Test]
+		public void Test_SuperstateSubState_WithMatchingEvents()
+		{
+			StateMachine sm = new StateMachine();
+			sm.AddState(States.Green)
+				.InitialState()
+				.TransitionTo(Events.Change, States.Yellow)
+				.AddState(States.GreenChild)
+					.InitialState()
+					.TransitionTo(Events.Change, States.Red, () => false);
+			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Green);
+			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+
+			sm.Start();
+
+			Assert.IsTrue(sm.InState(States.GreenChild));
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.Yellow));
+		}
+
+		[Test]
+		public void Test_TransitionToSuperState_WithDefaults()
+		{
+			StateMachine sm = new StateMachine();
+			sm.AddState(States.Green).InitialState();
+			sm[States.Green]
+				.AddState(States.GreenChild)
+				.TransitionTo(Events.Change, States.GreenChild2)
+				.InitialState();
+			sm[States.Green]
+				.AddState(States.GreenChild2)
+				.TransitionTo(Events.Change, States.Green);
+
+			sm.Start();
+			Assert.IsTrue(sm.InState(States.GreenChild));
+			Assert.IsTrue(sm.InState(States.Green));
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.GreenChild2));
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.GreenChild));
+			Assert.IsTrue(sm.InState(States.Green));
+		}
+
+		[Test]
 		public void Test_MultipleGuardedTransitions()
 		{
 			StateMachine sm = new StateMachine();

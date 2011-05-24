@@ -55,9 +55,19 @@ namespace Moe.StateMachine
 
 		public virtual void PostEvent(object eventToPost)
 		{
+			PostEvent(new EventInstance(eventToPost));
+		}
+
+		public virtual void PostEvent<T>(object eventToPost, T context)
+		{
+			PostEvent(new EventInstance(eventToPost, context));
+		}
+
+		protected virtual void PostEvent(EventInstance eventToPost)
+		{
 			UpdateTimers();
 
-			eventHandler.AddEvent(new EventInstance(eventToPost));
+			eventHandler.AddEvent(eventToPost);
 
 			while (eventHandler.CanProcess)
 				current = eventHandler.ProcessNextEvent(current);
