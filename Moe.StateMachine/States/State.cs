@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Moe.StateMachine.Events;
+using Moe.StateMachine.Transitions;
 
-namespace Moe.StateMachine
+namespace Moe.StateMachine.States
 {
 	public class State
 	{
@@ -11,7 +13,7 @@ namespace Moe.StateMachine
 		protected TransitionDirector transitions;
 		private StateActions actions;
 
-		internal State(object id, State parent)
+		public State(object id, State parent)
 		{
 			this.actions = new StateActions(this);
 			this.substates = new Dictionary<object, State>();

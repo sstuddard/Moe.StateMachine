@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Moe.StateMachine.Events;
+using Moe.StateMachine.States;
 
 namespace Moe.StateMachine
 {

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Moe.StateMachine.States;
+using Moe.StateMachine.Transitions;
 
 namespace Moe.StateMachine
 {

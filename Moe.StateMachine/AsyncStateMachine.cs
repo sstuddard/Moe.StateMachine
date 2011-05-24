@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Moe.StateMachine.Events;
+using Moe.StateMachine.States;
 
 namespace Moe.StateMachine
 {
-	public class AsyncStateMachine : StateMachine, IDisposable
+	public class AsyncStateMachine : StateMachine
 	{
 		private Thread stateThread;
 		private AutoResetEvent eventsQueued;

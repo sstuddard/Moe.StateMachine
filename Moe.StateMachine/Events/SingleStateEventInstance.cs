@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Moe.StateMachine.States;
+using Moe.StateMachine.Transitions;
 
-namespace Moe.StateMachine
+namespace Moe.StateMachine.Events
 {
 	public class SingleStateEventInstance : EventInstance
 	{
