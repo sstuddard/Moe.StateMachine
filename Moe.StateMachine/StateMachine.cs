@@ -20,19 +20,57 @@ namespace Moe.StateMachine
 		public StateMachine()
 		{
 			root = new RootState(this);
-			rootBuilder = new StateBuilder(this, root);
+			rootBuilder = this.CreateStateBuilder(root);
 			eventHandler = new EventProcessor();
 			timers = new TimerManager();
 		}
 
+		/// <summary>
+		/// Short circuit indexer.  This will fetch ANY state by id if it exists.
+		/// If it doesn't exist, it will be created off the root state.  
+		/// Statebuilder does NOT work the same way.
+		/// </summary>
+		/// <param name="idx">State ID</param>
+		/// <returns></returns>
     	public StateBuilder this[object idx] 
 		{ 
-			get { return rootBuilder[idx]; }
+			get
+			{
+				if (root.GetState(idx) != null)
+					return CreateStateBuilder(root.GetState(idx));
+				return rootBuilder[idx];
+			}
 		}
 
 		public RootState RootNode { get { return root; } }
 		public State CurrentState { get { return current; } }
 
+		/// <summary>
+		/// Extension point for creating own builders
+		/// </summary>
+		/// <param name="stateId"></param>
+		/// <param name="parent"></param>
+		/// <returns></returns>
+		public virtual StateBuilder CreateStateBuilder(object stateId, State parent)
+		{
+			return new StateBuilder(this, parent);
+		}
+
+		/// <summary>
+		/// Extension point for creating own builders
+		/// </summary>
+		/// <param name="state"></param>
+		/// <returns></returns>
+		public virtual StateBuilder CreateStateBuilder(State state)
+		{
+			return new StateBuilder(this, state);
+		}
+
+		/// <summary>
+		/// Returns bool indicating if the machine is in the given state (at any level)
+		/// </summary>
+		/// <param name="state"></param>
+		/// <returns></returns>
 		public virtual bool InState(object state)
 		{
 			bool result = false;
@@ -41,6 +79,9 @@ namespace Moe.StateMachine
 			return result;
 		}
 
+		/// <summary>
+		/// Starts the finite state machine
+		/// </summary>
     	public virtual void Start()
     	{
     		current = root.ProcessEvent(root, new SingleStateEventInstance(root, DefaultEntryEvent));
@@ -48,16 +89,29 @@ namespace Moe.StateMachine
 				throw new InvalidOperationException("No initial state found.");
 		}
 
+		/// <summary>
+		/// Sends a pulse event.  Primarily useful in a synchronous state machine with timers.
+		/// </summary>
 		public virtual void Pulse()
 		{
 			PostEvent(PulseEvent);
 		}
 
+		/// <summary>
+		/// Post an event to the state machine
+		/// </summary>
+		/// <param name="eventToPost"></param>
 		public virtual void PostEvent(object eventToPost)
 		{
 			PostEvent(new EventInstance(eventToPost));
 		}
 
+		/// <summary>
+		/// Post an event to the state machine
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="eventToPost"></param>
+		/// <param name="context"></param>
 		public virtual void PostEvent<T>(object eventToPost, T context)
 		{
 			PostEvent(new EventInstance(eventToPost, context));

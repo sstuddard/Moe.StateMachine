@@ -34,7 +34,7 @@ namespace Moe.StateMachine
 			{
 				if (!state.ContainsState(idx))
 					AddState(idx);
-				return new StateBuilder(stateMachine, state.GetState(idx));
+				return stateMachine.CreateStateBuilder(state.GetState(idx));
 			}
 		}
 
@@ -89,7 +89,7 @@ namespace Moe.StateMachine
 
 		public StateBuilder InitialState()
 		{
-			new StateBuilder(stateMachine, state.Parent).DefaultTransition(state.Id);
+			stateMachine.CreateStateBuilder(state.Parent).DefaultTransition(state.Id);
 			return this;
 		}
 
@@ -125,7 +125,7 @@ namespace Moe.StateMachine
 			State newState = CreateState(newStateId, state);
 			state.AddChildState(newState);
 
-			return new StateBuilder(stateMachine, newState);
+			return stateMachine.CreateStateBuilder(newState);
 		}
 		#endregion
 	}
