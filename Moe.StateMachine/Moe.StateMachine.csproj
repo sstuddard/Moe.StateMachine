@@ -40,6 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\ContextAction.cs" />
+    <Compile Include="Actions\IActionPerformer.cs" />
+    <Compile Include="Actions\SimpleAction.cs" />
+    <Compile Include="Actions\StateActions.cs" />
     <Compile Include="AsyncStateMachine.cs" />
     <Compile Include="Events\EventInstance.cs" />
     <Compile Include="Events\SingleStateEventInstance.cs" />
@@ -50,7 +54,6 @@
     <Compile Include="TimerManager.cs" />
     <Compile Include="EventProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StateActions.cs" />
     <Compile Include="StateBuilder.cs" />
     <Compile Include="StateMachine.cs" />
     <Compile Include="ThreadSafeQueue.cs" />

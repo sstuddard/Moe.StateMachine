@@ -5,7 +5,7 @@ using System.Text;
 using Moe.StateMachine.Events;
 using Moe.StateMachine.States;
 
-namespace Moe.StateMachine
+namespace Moe.StateMachine.Actions
 {
 	public class StateActions
 	{
@@ -15,12 +15,12 @@ namespace Moe.StateMachine
 			Exit
 		}
 
-		private State state;
+		private object stateId;
 		private Dictionary<ActionType, List<IActionPerformer>> actions;
 
-		public StateActions(State state)
+		public StateActions(object stateId)
 		{
-			this.state = state;
+			this.stateId = stateId;
 
 			actions = new Dictionary<ActionType, List<IActionPerformer>>();
 			actions[ActionType.Enter] = new List<IActionPerformer>();
@@ -49,47 +49,12 @@ namespace Moe.StateMachine
 
 		public void PerformEnter(EventInstance eventInstance)
 		{
-			actions[ActionType.Enter].ForEach(a => a.Perform(state.Id, eventInstance.Context));
+			actions[ActionType.Enter].ForEach(a => a.Perform(stateId, eventInstance.Context));
 		}
 
 		public void PerformExit(EventInstance eventInstance)
 		{
-			actions[ActionType.Exit].ForEach(a => a.Perform(state.Id, eventInstance.Context));
-		}
-
-		private interface IActionPerformer
-		{
-			void Perform(object stateId, object context);
-		}
-
-		private class SimpleAction : IActionPerformer
-		{
-			public Action<object> Action { get; private set; }
-
-			public SimpleAction(Action<object> action)
-			{
-				Action = action;
-			}
-
-			public virtual void Perform(object stateId, object context)
-			{
-				Action(stateId);
-			}
-		}
-
-		private class ContextAction<T> : IActionPerformer
-		{
-			public Action<object, T> Action { get; private set; }
-
-			public ContextAction(Action<object, T> action)
-			{
-				Action = action;
-			}
-
-			public virtual void Perform(object stateId, object context)
-			{
-				Action(stateId, (T) context);
-			}
+			actions[ActionType.Exit].ForEach(a => a.Perform(stateId, eventInstance.Context));
 		}
 	}
 }
