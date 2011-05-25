@@ -2,6 +2,6 @@
 {
 	public interface IActionPerformer
 	{
-		void Perform(object stateId, object context);
+		void Perform(TransitionReceipt transitionReceipt);
 	}
 }

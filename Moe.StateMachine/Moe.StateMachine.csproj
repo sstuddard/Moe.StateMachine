@@ -68,12 +68,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\ContextAction.cs" />
     <Compile Include="Actions\IActionPerformer.cs" />
     <Compile Include="Actions\SimpleAction.cs" />
     <Compile Include="Actions\StateActions.cs" />
+    <Compile Include="Actions\TransitionReceipt.cs" />
     <Compile Include="AsyncStateMachine.cs" />
     <Compile Include="Events\EventInstance.cs" />
+    <Compile Include="Extensions\EventWithLookup.cs" />
     <Compile Include="Events\SingleStateEventInstance.cs" />
     <Compile Include="States\RootState.cs" />
     <Compile Include="States\State.cs" />

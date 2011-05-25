@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Moe.StateMachine.Actions;
+using Moe.StateMachine.Events;
+using Moe.StateMachine.Extensions;
 using NUnit.Framework;
 using Moe.StateMachine;
 
@@ -78,9 +81,9 @@ namespace Moe.StateMachine.Tests
 		public void Test_Transitions_BasicTransitions_EnterActions()
 		{
 			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green).OnEnter(OnEnter).TransitionTo(Events.Change, States.Yellow).InitialState();
-			sm.AddState(States.Yellow).OnEnter(OnEnter).TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red).OnEnter(OnEnter).TransitionTo(Events.Change, States.Green);
+			sm.AddState(States.Green).OnEnter(tr => CaptureState("Enter", States.Green)).TransitionTo(Events.Change, States.Yellow).InitialState();
+			sm.AddState(States.Yellow).OnEnter(tr => CaptureState("Enter", States.Yellow)).TransitionTo(Events.Change, States.Red);
+			sm.AddState(States.Red).OnEnter(tr => CaptureState("Enter", States.Red)).TransitionTo(Events.Change, States.Green);
 
 			sm.Start();
 
@@ -100,9 +103,9 @@ namespace Moe.StateMachine.Tests
 		public void Test_Transitions_BasicTransitions_ExitActions()
 		{
 			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green).OnExit(OnExit).TransitionTo(Events.Change, States.Yellow).InitialState();
-			sm.AddState(States.Yellow).OnExit(OnExit).TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red).OnExit(OnExit).TransitionTo(Events.Change, States.Green);
+			sm.AddState(States.Green).OnExit(tr => CaptureState("Exit", States.Green)).TransitionTo(Events.Change, States.Yellow).InitialState();
+			sm.AddState(States.Yellow).OnExit(tr => CaptureState("Exit", States.Yellow)).TransitionTo(Events.Change, States.Red);
+			sm.AddState(States.Red).OnExit(tr => CaptureState("Exit", States.Red)).TransitionTo(Events.Change, States.Green);
 
 			sm.Start();
 
@@ -143,45 +146,49 @@ namespace Moe.StateMachine.Tests
 			StateMachine sm = new StateMachine();
 			sm.AddState(States.Green)
 				.TransitionTo(Events.Change, States.Yellow)
-				.OnExit<Dictionary<string,string>>(OnEnterExitWithContext)
+				.OnExit(CaptureEvent)
 				.InitialState();
 			sm.AddState(States.Yellow)
 				.TransitionTo(Events.Change, States.Red);
 			sm.AddState(States.Red)
-				.OnEnter<Dictionary<string, string>>(OnEnterExitWithContext)
+				.OnEnter(CaptureEvent)
 				.TransitionTo(Events.Change, States.Green);
 
-			Dictionary<string, string> context = new Dictionary<string, string>();
-			context["Did"] = "exit";
-
 			sm.Start();
-			sm.PostEvent(Events.Change, context);
-			Assert.IsNotNull(postedContext);
-			Assert.IsTrue(postedContext.ContainsKey("Did"));
-			Assert.AreEqual("exit", postedContext["Did"]);
 
-			postedContext = null;
-			context["Did"] = "enter";
-			sm.PostEvent(Events.Change, context);
-			Assert.IsNotNull(postedContext);
-			Assert.IsTrue(postedContext.ContainsKey("Did"));
-			Assert.AreEqual("enter", postedContext["Did"]);
+			var lookup = new Dictionary<string, string>();
+			lookup["Did"] = "exit";
+
+			sm.PostEvent(new MyEvent(Events.Change, lookup));
+			Assert.IsNotNull(receivedEvent);
+			Assert.IsTrue(receivedEvent["Did"] != null);
+			Assert.AreEqual("exit", receivedEvent["Did"]);
+
+			receivedEvent = null;
+			lookup["Did"] = "enter";
+			sm.PostEvent(new MyEvent(Events.Change, lookup));
+			Assert.IsNotNull(receivedEvent);
+			Assert.IsTrue(receivedEvent["Did"] != null);
+			Assert.AreEqual("enter", receivedEvent["Did"]);
 		}
 
-		private Dictionary<string, string> postedContext;
-		private void OnEnterExitWithContext(object stateEntered, Dictionary<string, string> context)
+		private EventWithLookup<Events> receivedEvent;
+		private void CaptureEvent(TransitionReceipt receipt)
 		{
-			postedContext = context;
+			receivedEvent = receipt.Event as MyEvent;
 		}
 
-		private void OnEnter(object stateEntered)
+		private void CaptureState(string prefix, object state)
 		{
-			events.Add("Enter: " + stateEntered.ToString());
+			events.Add(String.Format("{0}: {1}", prefix, state.ToString()));
 		}
 
-		private void OnExit(object stateEntered)
+		private class MyEvent : EventWithLookup<Events>
 		{
-			events.Add("Exit: " + stateEntered.ToString());
+			public MyEvent(Events eventId, Dictionary<string,string> lookup)
+				: base(eventId, lookup)
+			{
+			}
 		}
 	}
 }

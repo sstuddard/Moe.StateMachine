@@ -7,16 +7,16 @@ namespace Moe.StateMachine.Actions
 {
 	public class SimpleAction : IActionPerformer
 	{
-		public Action<object> Action { get; private set; }
+		public Action<TransitionReceipt> Action { get; private set; }
 
-		public SimpleAction(Action<object> action)
+		public SimpleAction(Action<TransitionReceipt> action)
 		{
 			Action = action;
 		}
 
-		public virtual void Perform(object stateId, object context)
+		public virtual void Perform(TransitionReceipt receipt)
 		{
-			Action(stateId);
+			Action(receipt);
 		}
 	}
 }

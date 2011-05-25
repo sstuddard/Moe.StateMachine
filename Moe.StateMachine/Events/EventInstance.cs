@@ -23,6 +23,7 @@ namespace Moe.StateMachine.Events
 		}
 
 		public object Context { get { return this.context; } }
+		public object Event { get { return this.eventTarget; } }
 
 		public virtual bool MatchesTransition(Transition transition)
 		{

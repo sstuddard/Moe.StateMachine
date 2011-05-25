@@ -18,6 +18,7 @@ namespace Moe.StateMachine.Transitions
 			this.eventInstance = eventInstance;
 		}
 
+		public State SourceState { get { return transition.SourceState; } }
 		public State TargetState { get { return transition.TargetState; } }
 		public EventInstance EventInstance { get { return eventInstance; } }
 	}

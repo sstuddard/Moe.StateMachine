@@ -18,7 +18,7 @@ namespace Moe.StateMachine.Sample
 			Red
 		}
 
-		private enum Events
+		private new enum Events
 		{
 			Change
 		}

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Moe.StateMachine.Events;
 using Moe.StateMachine.States;
+using Moe.StateMachine.Transitions;
 
 namespace Moe.StateMachine.Actions
 {
@@ -15,46 +16,33 @@ namespace Moe.StateMachine.Actions
 			Exit
 		}
 
-		private object stateId;
 		private Dictionary<ActionType, List<IActionPerformer>> actions;
 
-		public StateActions(object stateId)
+		public StateActions()
 		{
-			this.stateId = stateId;
-
 			actions = new Dictionary<ActionType, List<IActionPerformer>>();
 			actions[ActionType.Enter] = new List<IActionPerformer>();
 			actions[ActionType.Exit] = new List<IActionPerformer>();
 		}
 
-		public void AddExit(Action<object> action)
+		public void AddExit(Action<TransitionReceipt> action)
 		{
 			actions[ActionType.Exit].Add(new SimpleAction(action));
 		}
 
-		public void AddExit<T>(Action<object, T> action)
-		{
-			actions[ActionType.Exit].Add(new ContextAction<T>(action));
-		}
-
-		public void AddEnter(Action<object> action)
+		public void AddEnter(Action<TransitionReceipt> action)
 		{
 			actions[ActionType.Enter].Add(new SimpleAction(action));
 		}
 
-		public void AddEnter<T>(Action<object,T> action)
+		public void PerformEnter(TransitionEvent transitionEvent)
 		{
-			actions[ActionType.Enter].Add(new ContextAction<T>(action));
+			actions[ActionType.Enter].ForEach(a => a.Perform(new TransitionReceipt(transitionEvent)));
 		}
 
-		public void PerformEnter(EventInstance eventInstance)
+		public void PerformExit(TransitionEvent transitionEvent)
 		{
-			actions[ActionType.Enter].ForEach(a => a.Perform(stateId, eventInstance.Context));
-		}
-
-		public void PerformExit(EventInstance eventInstance)
-		{
-			actions[ActionType.Exit].ForEach(a => a.Perform(stateId, eventInstance.Context));
+			actions[ActionType.Exit].ForEach(a => a.Perform(new TransitionReceipt(transitionEvent)));
 		}
 	}
 }

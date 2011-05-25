@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Moe.StateMachine.Actions;
 using NUnit.Framework;
 
 namespace Moe.StateMachine.Tests
@@ -119,8 +120,8 @@ namespace Moe.StateMachine.Tests
 					.InitialState();
 
 			sm[States.Green]
-				.OnEnter(OnEnterState)
-				.OnExit(OnExitState)
+				.OnEnter(tr => OnEnter(States.Green))
+				.OnExit(tr => OnExit(States.Green))
 				.TransitionTo(Events.Change, States.Green);
 
 			sm.Start();
@@ -132,13 +133,13 @@ namespace Moe.StateMachine.Tests
 		}
 
 		private List<string> events = new List<string>();
-		private void OnEnterState(object stateId)
+		private void OnEnter(object state)
 		{
-			events.Add("Enter: " + stateId.ToString());
+			events.Add("Enter: " + state.ToString());
 		}
-		private void OnExitState(object stateId)
+		private void OnExit(object state)
 		{
-			events.Add("Exit: " + stateId.ToString());
+			events.Add("Exit: " + state.ToString());
 		}
 	}
 }

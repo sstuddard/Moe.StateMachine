@@ -15,7 +15,7 @@ namespace Moe.StateMachine
 		public StateBuilder(StateMachine stateMachine, object stateId, State parent)
 		{
 			this.stateMachine = stateMachine;
-			this.stateActions = new StateActions(stateId);
+			this.stateActions = new StateActions();
 			this.state = CreateState(stateId, parent);
 		}
 
@@ -40,7 +40,7 @@ namespace Moe.StateMachine
 
 		public virtual State CreateState(object stateId, State parent)
 		{
-			return new State(stateId, parent, new StateActions(stateId));
+			return new State(stateId, parent, new StateActions());
 		}
 
 		#region Builder methods
@@ -93,25 +93,13 @@ namespace Moe.StateMachine
 			return this;
 		}
 
-		public StateBuilder OnEnter(Action<object> action)
+		public StateBuilder OnEnter(Action<TransitionReceipt> action)
 		{
 			stateActions.AddEnter(action);
 			return this;
 		}
 
-		public StateBuilder OnEnter<T>(Action<object,T> action)
-		{
-			stateActions.AddEnter(action);
-			return this;
-		}
-
-		public StateBuilder OnExit(Action<object> action)
-		{
-			stateActions.AddExit(action);
-			return this;
-		}
-
-		public StateBuilder OnExit<T>(Action<object, T> action)
+		public StateBuilder OnExit(Action<TransitionReceipt> action)
 		{
 			stateActions.AddExit(action);
 			return this;

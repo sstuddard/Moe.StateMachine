@@ -35,12 +35,12 @@ namespace Moe.StateMachine.States
 
 		protected virtual void Enter(TransitionEvent transition)
 		{
-			actions.PerformEnter(transition.EventInstance);
+			actions.PerformEnter(transition);
 		}
 
 		protected virtual void Exit(TransitionEvent transition)
 		{
-			actions.PerformExit(transition.EventInstance);
+			actions.PerformExit(transition);
 		}
 
 		public void AddTransition(Transition transition)

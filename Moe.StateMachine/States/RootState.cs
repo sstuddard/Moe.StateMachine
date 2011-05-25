@@ -14,7 +14,7 @@ namespace Moe.StateMachine.States
 		private StateMachine stateMachine;
 
 		public RootState(StateMachine stateMachine) 
-			: base(RootStateId, null, new StateActions(RootStateId))
+			: base(RootStateId, null, new StateActions())
 		{
 			this.stateMachine = stateMachine;
 		}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Moe.StateMachine.Actions;
 using NUnit.Framework;
 
 namespace Moe.StateMachine.Tests
@@ -50,12 +51,25 @@ namespace Moe.StateMachine.Tests
 		public void Test_Transition_ThreeLevelToTwoLevelTransition()
 		{
 			StateMachine sm = new StateMachine();
-			sm.AddState(States.GreenParent).OnEnter(OnEnter).OnExit(OnExit).InitialState()
-				.AddState(States.GreenChild).OnEnter(OnEnter).OnExit(OnExit).InitialState()
-					.AddState(States.GreenGrandChild).InitialState()
-						.TransitionTo(Events.Change, States.RedChild).OnEnter(OnEnter).OnExit(OnExit);
-			sm.AddState(States.RedParent).OnEnter(OnEnter).OnExit(OnExit)
-				.AddState(States.RedChild).OnEnter(OnEnter).OnExit(OnExit);
+			sm.AddState(States.GreenParent)
+				.OnEnter(tr => OnEnter(States.GreenParent))
+				.OnExit(tr => OnExit(States.GreenParent))
+				.InitialState()
+				.AddState(States.GreenChild)
+					.OnEnter(tr => OnEnter(States.GreenChild))
+					.OnExit(tr => OnExit(States.GreenChild))
+					.InitialState()
+						.AddState(States.GreenGrandChild)
+							.InitialState()
+							.TransitionTo(Events.Change, States.RedChild)
+							.OnEnter(tr => OnEnter(States.GreenGrandChild))
+							.OnExit(tr => OnExit(States.GreenGrandChild));
+			sm.AddState(States.RedParent)
+				.OnEnter(tr => OnEnter(States.RedParent))
+				.OnExit(tr => OnExit(States.RedParent))
+				.AddState(States.RedChild)
+					.OnEnter(tr => OnEnter(States.RedChild))
+					.OnExit(tr => OnExit(States.RedChild));
 
 			sm.Start();
 
@@ -75,14 +89,14 @@ namespace Moe.StateMachine.Tests
 			Assert.AreEqual("Enter: RedChild", events[4]);
 		}
 
-		private void OnEnter(object stateEntered)
+		private void OnEnter(object state)
 		{
-			events.Add("Enter: " + stateEntered.ToString());
+			events.Add("Enter: " + state.ToString());
 		}
 
-		private void OnExit(object stateEntered)
+		private void OnExit(object state)
 		{
-			events.Add("Exit: " + stateEntered.ToString());
+			events.Add("Exit: " + state.ToString());
 		}
 	}
 }
