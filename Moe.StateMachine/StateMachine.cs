@@ -13,7 +13,7 @@ namespace Moe.StateMachine
 
     	protected State current;
 		protected RootState root;
-		protected StateBuilder rootBuilder;
+		protected IStateBuilder rootBuilder;
 		protected EventProcessor eventHandler;
 		protected TimerManager timers;
 
@@ -32,7 +32,7 @@ namespace Moe.StateMachine
 		/// </summary>
 		/// <param name="idx">State ID</param>
 		/// <returns></returns>
-    	public StateBuilder this[object idx] 
+    	public IStateBuilder this[object idx] 
 		{ 
 			get
 			{
@@ -51,7 +51,7 @@ namespace Moe.StateMachine
 		/// <param name="stateId"></param>
 		/// <param name="parent"></param>
 		/// <returns></returns>
-		public virtual StateBuilder CreateStateBuilder(object stateId, State parent)
+		public virtual IStateBuilder CreateStateBuilder(object stateId, State parent)
 		{
 			return new StateBuilder(this, parent);
 		}
@@ -61,7 +61,7 @@ namespace Moe.StateMachine
 		/// </summary>
 		/// <param name="state"></param>
 		/// <returns></returns>
-		public virtual StateBuilder CreateStateBuilder(State state)
+		public virtual IStateBuilder CreateStateBuilder(State state)
 		{
 			return new StateBuilder(this, state);
 		}
@@ -146,17 +146,17 @@ namespace Moe.StateMachine
 		}
 
 		#region StateBuilder forwarding and help
-		public StateBuilder AddState(object identifier)
+		public IStateBuilder AddState(object identifier)
 		{
 			return rootBuilder.AddState(identifier);
 		}
 
-		public StateBuilder DefaultTransition(object targetState)
+		public IStateBuilder DefaultTransition(object targetState)
 		{
 			return rootBuilder.DefaultTransition(targetState);
 		}
 
-		public StateBuilder DefaultTransition(object targetState, Func<bool> guard)
+		public IStateBuilder DefaultTransition(object targetState, Func<bool> guard)
 		{
 			return rootBuilder.DefaultTransition(targetState, guard);
 		}

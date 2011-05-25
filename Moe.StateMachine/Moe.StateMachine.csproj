@@ -73,6 +73,13 @@
     <Compile Include="Actions\StateActions.cs" />
     <Compile Include="Actions\TransitionReceipt.cs" />
     <Compile Include="AsyncStateMachine.cs" />
+    <Compile Include="Builders\IStateBuilder.cs" />
+    <Compile Include="Builders\StateBuilder.cs" />
+    <Compile Include="Builders\StateBuilderExtensions.cs" />
+    <Compile Include="Builders\StateBuilderSkeleton.cs" />
+    <Compile Include="Builders\ActionBuilder.cs" />
+    <Compile Include="Builders\TimerBuilder.cs" />
+    <Compile Include="Builders\TransitionBuilder.cs" />
     <Compile Include="Events\EventInstance.cs" />
     <Compile Include="Extensions\EventWithLookup.cs" />
     <Compile Include="Events\SingleStateEventInstance.cs" />
@@ -83,7 +90,6 @@
     <Compile Include="TimerManager.cs" />
     <Compile Include="EventProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StateBuilder.cs" />
     <Compile Include="StateMachine.cs" />
     <Compile Include="ThreadSafeQueue.cs" />
     <Compile Include="TransitionDirector.cs" />
