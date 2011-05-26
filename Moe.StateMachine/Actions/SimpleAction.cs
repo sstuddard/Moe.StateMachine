@@ -7,10 +7,12 @@ namespace Moe.StateMachine.Actions
 {
 	public class SimpleAction : IActionPerformer
 	{
+		public ActionType Type { get; private set; }
 		public Action<TransitionReceipt> Action { get; private set; }
 
-		public SimpleAction(Action<TransitionReceipt> action)
+		public SimpleAction(ActionType type, Action<TransitionReceipt> action)
 		{
+			Type = type;
 			Action = action;
 		}
 

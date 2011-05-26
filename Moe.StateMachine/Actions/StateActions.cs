@@ -1,48 +1,57 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Moe.StateMachine.Events;
 using Moe.StateMachine.States;
-using Moe.StateMachine.Transitions;
 
 namespace Moe.StateMachine.Actions
 {
 	public class StateActions
 	{
-		private enum ActionType
+		private State state;
+		private List<IActionPerformer> actions;
+
+		public StateActions(State state)
 		{
-			Enter,
-			Exit
+			this.state = state;
+			this.state.Entered += OnStateEntered;
+			this.state.Exited += OnStateExited;
+
+			actions = new List<IActionPerformer>();
 		}
 
-		private Dictionary<ActionType, List<IActionPerformer>> actions;
-
-		public StateActions()
+		public void AddAction(IActionPerformer action)
 		{
-			actions = new Dictionary<ActionType, List<IActionPerformer>>();
-			actions[ActionType.Enter] = new List<IActionPerformer>();
-			actions[ActionType.Exit] = new List<IActionPerformer>();
+			actions.Add(action);
 		}
 
-		public void AddExit(Action<TransitionReceipt> action)
+		public void RemoveAction(IActionPerformer action)
 		{
-			actions[ActionType.Exit].Add(new SimpleAction(action));
+			actions.Remove(action);
 		}
 
-		public void AddEnter(Action<TransitionReceipt> action)
+		public bool ContainsAction(IActionPerformer action)
 		{
-			actions[ActionType.Enter].Add(new SimpleAction(action));
+			return actions.Contains(action);
 		}
 
-		public void PerformEnter(TransitionEvent transitionEvent)
+		private void OnStateEntered(object sender, StateEventArgs args)
 		{
-			actions[ActionType.Enter].ForEach(a => a.Perform(new TransitionReceipt(transitionEvent)));
+			IEnumerable<IActionPerformer> toPerform = 
+				new List<IActionPerformer>(actions.Where(ap => ap.Type == ActionType.Enter));
+			
+			foreach (IActionPerformer action in toPerform)
+				action.Perform(new TransitionReceipt(args.TransitionEvent));
 		}
 
-		public void PerformExit(TransitionEvent transitionEvent)
+		private void OnStateExited(object sender, StateEventArgs args)
 		{
-			actions[ActionType.Exit].ForEach(a => a.Perform(new TransitionReceipt(transitionEvent)));
+			IEnumerable<IActionPerformer> toPerform = 
+				new List<IActionPerformer>(actions.Where(ap => ap.Type == ActionType.Exit));
+			
+			foreach (IActionPerformer action in toPerform)
+				action.Perform(new TransitionReceipt(args.TransitionEvent));
 		}
 	}
 }

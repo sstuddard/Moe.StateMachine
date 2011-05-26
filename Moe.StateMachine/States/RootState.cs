@@ -11,12 +11,10 @@ namespace Moe.StateMachine.States
 	public class RootState : State
 	{
 		public const string RootStateId = "Root";
-		private StateMachine stateMachine;
 
-		public RootState(StateMachine stateMachine) 
-			: base(RootStateId, null, new StateActions())
+		public RootState() 
+			: base(RootStateId, null)
 		{
-			this.stateMachine = stateMachine;
 		}
 
 		/// <summary>

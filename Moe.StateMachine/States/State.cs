@@ -8,17 +8,18 @@ namespace Moe.StateMachine.States
 {
 	public class State
 	{
+		public event EventHandler<StateEventArgs> Entered;
+		public event EventHandler<StateEventArgs> Exited;
+
 		private State parent;
 		private object id;
 		private Dictionary<object, State> substates;
 		protected TransitionDirector transitions;
-		protected StateActions actions;
 
-		public State(object id, State parent, StateActions actions)
+		public State(object id, State parent)
 		{
 			this.id = id;
 			this.parent = parent;
-			this.actions = actions;
 			this.substates = new Dictionary<object, State>();
 			this.transitions = new TransitionDirector();
 		}
@@ -26,7 +27,6 @@ namespace Moe.StateMachine.States
 		public object Id { get { return id; } }
 		public IEnumerable<State> Substates { get { return substates.Values; } }
 		public State Parent { get { return parent; } }
-		public StateActions Actions { get { return actions; } }
 
 		public void AddChildState(State substate)
 		{
@@ -35,12 +35,14 @@ namespace Moe.StateMachine.States
 
 		protected virtual void Enter(TransitionEvent transition)
 		{
-			actions.PerformEnter(transition);
+			if (Entered != null)
+				Entered(this, new StateEventArgs(transition));
 		}
 
 		protected virtual void Exit(TransitionEvent transition)
 		{
-			actions.PerformExit(transition);
+			if (Exited != null)
+				Exited(this, new StateEventArgs(transition));
 		}
 
 		public void AddTransition(Transition transition)

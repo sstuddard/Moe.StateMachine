@@ -15,14 +15,16 @@ namespace Moe.StateMachine
 		protected RootState root;
 		protected IStateBuilder rootBuilder;
 		protected EventProcessor eventHandler;
+    	protected StateActionDirector stateActions;
 		protected TimerManager timers;
 
 		public StateMachine()
 		{
-			root = new RootState(this);
+			root = new RootState();
 			rootBuilder = this.CreateStateBuilder(root);
 			eventHandler = new EventProcessor();
 			timers = new TimerManager();
+			stateActions = new StateActionDirector();
 		}
 
 		/// <summary>
@@ -42,6 +44,7 @@ namespace Moe.StateMachine
 			}
 		}
 
+		public StateActionDirector StateActions { get { return stateActions; } }
 		public RootState RootNode { get { return root; } }
 		public State CurrentState { get { return current; } }
 
@@ -104,17 +107,6 @@ namespace Moe.StateMachine
 		public virtual void PostEvent(object eventToPost)
 		{
 			PostEvent(new EventInstance(eventToPost));
-		}
-
-		/// <summary>
-		/// Post an event to the state machine
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="eventToPost"></param>
-		/// <param name="context"></param>
-		public virtual void PostEvent<T>(object eventToPost, T context)
-		{
-			PostEvent(new EventInstance(eventToPost, context));
 		}
 
 		protected virtual void PostEvent(EventInstance eventToPost)

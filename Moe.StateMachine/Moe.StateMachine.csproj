@@ -70,12 +70,14 @@
   <ItemGroup>
     <Compile Include="Actions\IActionPerformer.cs" />
     <Compile Include="Actions\SimpleAction.cs" />
-    <Compile Include="Actions\StateActions.cs" />
+    <Compile Include="Actions\StateActionDirector.cs" />
+    <Compile Include="Actions\StateActions.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Actions\TransitionReceipt.cs" />
     <Compile Include="AsyncStateMachine.cs" />
     <Compile Include="Builders\IStateBuilder.cs" />
     <Compile Include="Builders\StateBuilder.cs" />
-    <Compile Include="Builders\StateBuilderExtensions.cs" />
     <Compile Include="Builders\StateBuilderSkeleton.cs" />
     <Compile Include="Builders\ActionBuilder.cs" />
     <Compile Include="Builders\TimerBuilder.cs" />
@@ -83,8 +85,12 @@
     <Compile Include="Events\EventInstance.cs" />
     <Compile Include="Extensions\EventWithLookup.cs" />
     <Compile Include="Events\SingleStateEventInstance.cs" />
+    <Compile Include="Extensions\StateWatcher\CompositeStateWatcherAction.cs" />
+    <Compile Include="Extensions\StateWatcher\StateWatcherAction.cs" />
+    <Compile Include="Extensions\StateWatcher\StateWatcherBuilder.cs" />
     <Compile Include="States\RootState.cs" />
     <Compile Include="States\State.cs" />
+    <Compile Include="States\StateEventArgs.cs" />
     <Compile Include="States\StateExtensions.cs" />
     <Compile Include="States\StateLocator.cs" />
     <Compile Include="TimerManager.cs" />

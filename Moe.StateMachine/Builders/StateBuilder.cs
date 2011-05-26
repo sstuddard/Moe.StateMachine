@@ -28,6 +28,11 @@ namespace Moe.StateMachine
 		public State State { get { return state; } }
 		public StateMachine StateMachine { get { return stateMachine; } }
 
+		public static implicit operator State(StateBuilder builder)
+		{
+			return builder.State;
+		}
+
 		public virtual IStateBuilder this[object idx]
 		{
 			get
@@ -40,7 +45,7 @@ namespace Moe.StateMachine
 
 		public virtual State CreateState(object stateId, State parent)
 		{
-			return new State(stateId, parent, new StateActions());
+			return new State(stateId, parent);
 		}
 
 		#region Builder methods

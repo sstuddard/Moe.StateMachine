@@ -15,13 +15,13 @@ namespace Moe.StateMachine.Builders
 
 		public override IStateBuilder OnEnter(Action<TransitionReceipt> action)
 		{
-			State.Actions.AddEnter(action);
+			StateMachine.StateActions.AddAction(State, new SimpleAction(ActionType.Enter, action));
 			return sourceBuilder;
 		}
 
 		public override IStateBuilder OnExit(Action<TransitionReceipt> action)
 		{
-			State.Actions.AddExit(action);
+			StateMachine.StateActions.AddAction(State, new SimpleAction(ActionType.Exit, action));
 			return sourceBuilder;
 		}
 	}
