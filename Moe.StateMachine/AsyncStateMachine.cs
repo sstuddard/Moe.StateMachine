@@ -26,7 +26,7 @@ namespace Moe.StateMachine
 				throw new ArgumentException();
 
 			this.root = sm.RootNode;
-			this.rootBuilder = new StateBuilder(this, root);
+			this.rootBuilder = sm.CreateStateBuilder(root);
 		}
 
 		public override void Start()

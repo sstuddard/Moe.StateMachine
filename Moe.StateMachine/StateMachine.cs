@@ -51,17 +51,6 @@ namespace Moe.StateMachine
 		/// <summary>
 		/// Extension point for creating own builders
 		/// </summary>
-		/// <param name="stateId"></param>
-		/// <param name="parent"></param>
-		/// <returns></returns>
-		public virtual IStateBuilder CreateStateBuilder(object stateId, State parent)
-		{
-			return new StateBuilder(this, parent);
-		}
-
-		/// <summary>
-		/// Extension point for creating own builders
-		/// </summary>
 		/// <param name="state"></param>
 		/// <returns></returns>
 		public virtual IStateBuilder CreateStateBuilder(State state)
