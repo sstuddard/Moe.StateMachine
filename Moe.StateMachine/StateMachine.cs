@@ -28,14 +28,15 @@ namespace Moe.StateMachine
 
 		public static readonly object DefaultEntryEvent = "DefaultEntry";
 
-    	protected readonly List<IPlugIn> plugins; 
-    	protected State current;
+    	protected readonly List<IPlugIn> plugins;
 		protected readonly State root;
+		protected State current;
 		protected EventProcessor eventProcessor;
     	protected StateMachineState stateMachineState;
 
-		public StateMachine(IStateMachineInitializer initializer)
+		public StateMachine(string fsmName, IStateMachineInitializer initializer)
 		{
+			Name = fsmName;
 			stateMachineState = StateMachineState.Building;
 
 			plugins = new List<IPlugIn>();
@@ -53,6 +54,7 @@ namespace Moe.StateMachine
 			stateMachineState = StateMachineState.Ready;
 		}
 
+		public string Name { get; private set; }
 		public State RootNode { get { return root; } }
 		public State CurrentState { get { return current; } }
 		public bool IsRunning { get { return stateMachineState == StateMachineState.Started; } }
@@ -97,7 +99,6 @@ namespace Moe.StateMachine
 		/// <summary>
 		/// Allow for custom event posters (such as the async state machine)
 		/// </summary>
-		/// <param name="poster"></param>
 		/// <param name="processor"></param>
 		private void RegisterEventProcessor(EventProcessor processor)
 		{
@@ -121,7 +122,7 @@ namespace Moe.StateMachine
 			eventProcessor.AddEvent(newEvent);
 		}
 
-		public virtual void AddPlugIn(IPlugIn plugin)
+		public void AddPlugIn(IPlugIn plugin)
 		{
 			plugins.Add(plugin);
 

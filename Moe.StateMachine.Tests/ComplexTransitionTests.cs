@@ -26,7 +26,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Green);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.GreenChild));
@@ -46,7 +46,7 @@ namespace Moe.StateMachine.Tests
 				.AddState(States.GreenChild2)
 				.TransitionTo(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 			Assert.IsTrue(sm.InState(States.GreenChild));
 			Assert.IsTrue(sm.InState(States.Green));
@@ -68,7 +68,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Green);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -91,7 +91,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Green);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Red));
@@ -105,7 +105,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red).OnEnter(s => sm.PostEvent(Events.Change));
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			sm = new StateMachine(smb);
+			sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -128,7 +128,7 @@ namespace Moe.StateMachine.Tests
 				.OnExit(tr => OnExit(States.Green))
 				.TransitionTo(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 			sm.PostEvent(Events.Change);
 

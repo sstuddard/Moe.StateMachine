@@ -57,7 +57,7 @@ namespace Moe.StateMachine.Sample
 				.OnEnter(s => pnlRed.BackColor = RedOn)
 				.OnExit(s => pnlRed.BackColor = RedOff);
 
-			stateMachine = new StateMachine(stateMachineBuilder);
+			stateMachine = new StateMachine("StopLight", stateMachineBuilder);
 			stateMachine.Asynchronous();
 		}
 

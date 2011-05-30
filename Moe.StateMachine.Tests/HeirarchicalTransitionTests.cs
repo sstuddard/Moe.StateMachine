@@ -23,7 +23,7 @@ namespace Moe.StateMachine.Tests
 				.AddState(States.GreenChild).InitialState();
 			smb.AddState(States.RedParent);
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.GreenParent));
@@ -37,7 +37,7 @@ namespace Moe.StateMachine.Tests
 				.AddState(States.GreenChild).InitialState();
 			smb.AddState(States.RedParent).TransitionTo(Events.Change, States.GreenParent).InitialState();
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.RedParent));
@@ -68,7 +68,7 @@ namespace Moe.StateMachine.Tests
 					.OnEnter(tr => OnEnter(States.RedChild))
 					.OnExit(tr => OnExit(States.RedChild));
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			events.Clear();

@@ -25,7 +25,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -38,7 +38,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -58,7 +58,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -81,7 +81,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).OnEnter(tr => CaptureState("Enter", States.Yellow)).TransitionTo(Events.Change, States.Red);
 			smb.AddState(States.Red).OnEnter(tr => CaptureState("Enter", States.Red)).TransitionTo(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			sm.PostEvent(Events.Change);
@@ -103,7 +103,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).OnExit(tr => CaptureState("Exit", States.Yellow)).TransitionTo(Events.Change, States.Red);
 			smb.AddState(States.Red).OnExit(tr => CaptureState("Exit", States.Red)).TransitionTo(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			sm.PostEvent(Events.Change);
@@ -125,7 +125,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine(smb);
+			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			// Transition should not go

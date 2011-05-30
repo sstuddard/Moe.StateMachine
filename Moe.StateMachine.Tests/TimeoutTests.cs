@@ -29,7 +29,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			var sm = new StateMachine(smb).Asynchronous().Logger(new ConsoleLogger());
+			var sm = new StateMachine("Test", smb).Asynchronous().Logger(new ConsoleLogger());
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -47,7 +47,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			var sm = new StateMachine(smb);
+			var sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -67,7 +67,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			var sm = new StateMachine(smb).Asynchronous();
+			var sm = new StateMachine("Test", smb).Asynchronous();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -88,7 +88,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			var sm = new StateMachine(smb).Asynchronous();
+			var sm = new StateMachine("Test", smb).Asynchronous();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -111,7 +111,7 @@ namespace Moe.StateMachine.Tests
 			smb[States.Green][States.GreenChild2]
 				.Timeout(200, States.Gold);
 
-			var sm = new StateMachine(smb).Asynchronous();
+			var sm = new StateMachine("Test", smb).Asynchronous();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.GreenChild));
@@ -136,7 +136,7 @@ namespace Moe.StateMachine.Tests
 				.Timeout(1000, States.Red)
 				.TransitionTo(Events.Change, States.GreenChild);
 
-			var sm = new StateMachine(smb);
+			var sm = new StateMachine("Test", smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.GreenChild));
