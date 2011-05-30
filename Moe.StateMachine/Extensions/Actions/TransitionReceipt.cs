@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Moe.StateMachine.Transitions;
 
-namespace Moe.StateMachine.Actions
+namespace Moe.StateMachine
 {
 	public class TransitionReceipt
 	{

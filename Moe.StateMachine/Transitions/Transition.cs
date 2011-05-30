@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Moe.StateMachine.Events;
+﻿using Moe.StateMachine.Events;
 using Moe.StateMachine.States;
 
 namespace Moe.StateMachine.Transitions
@@ -11,9 +7,9 @@ namespace Moe.StateMachine.Transitions
 	{
 		private State sourceState;
 		private object eventTarget;
-		private StateLocator targetState;
+		private State targetState;
 
-		public Transition(State sourceState, object eventTarget, StateLocator targetState)
+		public Transition(State sourceState, object eventTarget, State targetState)
 		{
 			this.sourceState = sourceState;
 			this.eventTarget = eventTarget;

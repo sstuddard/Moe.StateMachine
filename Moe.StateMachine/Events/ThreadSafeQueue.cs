@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace Moe.StateMachine
+namespace Moe.StateMachine.Events
 {
 	/// <summary>
 	/// A relatively naive thread safe queue that will fit the need.

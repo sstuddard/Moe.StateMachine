@@ -1,28 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using Moe.StateMachine.Events;
 using Moe.StateMachine.States;
 
-namespace Moe.StateMachine
+namespace Moe.StateMachine.Events
 {
-	public class EventProcessor
+	public abstract class EventProcessor
 	{
+		public event EventHandler<StateEventPostedArgs> EventProcessed;
+
 		private const int NotProcessing = 0;
 		private const int Processing = 1;
 
-		private ThreadSafeQueue<EventInstance> events;
+		protected ThreadSafeQueue<EventInstance> events;
 		private int processingIndicator;
 
-		public EventProcessor()
+		protected EventProcessor()
 		{
 			events = new ThreadSafeQueue<EventInstance>();
 			processingIndicator = NotProcessing;
+			EventProcessed += delegate { };
 		}
 
-		public void AddEvent(EventInstance eventToAdd)
+		public virtual void AddEvent(EventInstance eventToAdd)
 		{
 			events.Enqueue(eventToAdd);
 		}
@@ -34,7 +34,7 @@ namespace Moe.StateMachine
 			get { return HasEvents && processingIndicator == NotProcessing; }
 		}
 
-		public State ProcessNextEvent(State currentState)
+		public void ProcessNextEvent(State currentState)
 		{
 			// Processing should not be re-entrant, on the same thread or otherwise
 			if (NotProcessing == Interlocked.CompareExchange(ref processingIndicator, Processing, NotProcessing))
@@ -44,9 +44,12 @@ namespace Moe.StateMachine
 					currentState = currentState.ProcessEvent(currentState, eventToProcess);
 
 				processingIndicator = NotProcessing;
+
+				if (currentState == null || currentState.Substates.Count() > 0)
+					throw new InvalidOperationException("Current state [" + currentState + "] is a superstate or null.");
+
+				EventProcessed(this, new StateEventPostedArgs(currentState, eventToProcess));
 			}
-			
-			return currentState;
 		}
 	}
 }

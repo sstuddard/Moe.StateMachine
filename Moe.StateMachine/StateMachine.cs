@@ -1,62 +1,66 @@
 ﻿using System;
-using Moe.StateMachine.Actions;
+using System.Collections.Generic;
 using Moe.StateMachine.Events;
+using Moe.StateMachine.Extensions;
 using Moe.StateMachine.States;
 
 namespace Moe.StateMachine
 {
+	public interface IStateMachineInitializer
+	{
+		State Initialize(StateMachine sm);
+	}
+
+	public enum StateMachineState
+	{
+		Building,
+		Ready,
+		Started,
+		Stopped
+	}
+
     public class StateMachine : IDisposable
     {
+		public event EventHandler<EventPostedArgs> EventPosted;
+		public event EventHandler<StateEventPostedArgs> EventProcessed;
+		public event EventHandler<EventArgs> Starting;
+    	public event EventHandler<EventArgs> Stopping;
+
 		public static readonly object DefaultEntryEvent = "DefaultEntry";
-		public static readonly object TimeoutEvent = "Timeout";
-    	public static readonly object PulseEvent = "Pulse";
 
+    	protected readonly List<IPlugIn> plugins; 
     	protected State current;
-		protected RootState root;
-		protected IStateBuilder rootBuilder;
-		protected EventProcessor eventHandler;
-    	protected StateActionDirector stateActions;
-		protected TimerManager timers;
+		protected readonly State root;
+		protected EventProcessor eventProcessor;
+    	protected StateMachineState stateMachineState;
 
-		public StateMachine()
+		public StateMachine(IStateMachineInitializer initializer)
 		{
-			root = new RootState();
-			rootBuilder = this.CreateStateBuilder(root);
-			eventHandler = new EventProcessor();
-			timers = new TimerManager();
-			stateActions = new StateActionDirector();
+			stateMachineState = StateMachineState.Building;
+
+			plugins = new List<IPlugIn>();
+
+			// Wire null event handlers for simplicity
+			EventPosted += delegate { };
+			EventProcessed += delegate { };
+			Starting += delegate { };
+			Stopping += delegate { };
+
+			AddPlugIn(new SynchronousEventProcessor());
+
+			root = initializer.Initialize(this);
+
+			stateMachineState = StateMachineState.Ready;
 		}
 
-		/// <summary>
-		/// Short circuit indexer.  This will fetch ANY state by id if it exists.
-		/// If it doesn't exist, it will be created off the root state.  
-		/// Statebuilder does NOT work the same way.
-		/// </summary>
-		/// <param name="idx">State ID</param>
-		/// <returns></returns>
-    	public IStateBuilder this[object idx] 
-		{ 
-			get
-			{
-				if (root.GetState(idx) != null)
-					return CreateStateBuilder(root.GetState(idx));
-				return rootBuilder[idx];
-			}
-		}
-
-		public StateActionDirector StateActions { get { return stateActions; } }
-		public RootState RootNode { get { return root; } }
+		public State RootNode { get { return root; } }
 		public State CurrentState { get { return current; } }
+		public bool IsRunning { get { return stateMachineState == StateMachineState.Started; } }
 
-		/// <summary>
-		/// Extension point for creating own builders
-		/// </summary>
-		/// <param name="state"></param>
-		/// <returns></returns>
-		public virtual IStateBuilder CreateStateBuilder(State state)
-		{
-			return new StateBuilder(this, state);
-		}
+    	public State this[object stateId]
+    	{
+    		get { return RootNode.GetState(stateId); }
+    	}
 
 		/// <summary>
 		/// Returns bool indicating if the machine is in the given state (at any level)
@@ -75,18 +79,33 @@ namespace Moe.StateMachine
 		/// Starts the finite state machine
 		/// </summary>
     	public virtual void Start()
-    	{
+		{
+			stateMachineState = StateMachineState.Started;
+			Starting(this, new EventArgs());
     		current = root.ProcessEvent(root, new SingleStateEventInstance(root, DefaultEntryEvent));
-			if (current == null || current == root)
-				throw new InvalidOperationException("No initial state found.");
 		}
 
 		/// <summary>
-		/// Sends a pulse event.  Primarily useful in a synchronous state machine with timers.
+		/// Stops the finite state machine
 		/// </summary>
-		public virtual void Pulse()
+		public virtual void Stop()
 		{
-			PostEvent(PulseEvent);
+			Stopping(this, new EventArgs());
+			stateMachineState = StateMachineState.Stopped;
+		}
+
+		/// <summary>
+		/// Allow for custom event posters (such as the async state machine)
+		/// </summary>
+		/// <param name="poster"></param>
+		/// <param name="processor"></param>
+		private void RegisterEventProcessor(EventProcessor processor)
+		{
+			if (eventProcessor != null)
+				eventProcessor.EventProcessed -= OnStateChanged;
+
+			eventProcessor = processor;
+			eventProcessor.EventProcessed += OnStateChanged;
 		}
 
 		/// <summary>
@@ -95,61 +114,37 @@ namespace Moe.StateMachine
 		/// <param name="eventToPost"></param>
 		public virtual void PostEvent(object eventToPost)
 		{
-			PostEvent(new EventInstance(eventToPost));
+			EventInstance newEvent = eventToPost as EventInstance;
+			if (newEvent == null)
+				newEvent = new EventInstance(eventToPost);
+			EventPosted(this, new EventPostedArgs(newEvent));
+			eventProcessor.AddEvent(newEvent);
 		}
 
-		protected virtual void PostEvent(EventInstance eventToPost)
+		public virtual void AddPlugIn(IPlugIn plugin)
 		{
-			UpdateTimers();
+			plugins.Add(plugin);
 
-			eventHandler.AddEvent(eventToPost);
+			// If it is an event processor, register it
+			if (plugin is EventProcessor)
+				RegisterEventProcessor(plugin as EventProcessor);
 
-			while (eventHandler.CanProcess)
-				current = eventHandler.ProcessNextEvent(current);
+			plugin.Initialize(this);
 		}
 
-		public virtual void RegisterTimer(State s, DateTime timeout)
+		private void OnStateChanged(object sender, StateEventPostedArgs args)
 		{
-			timers.SetTimer(s, timeout);
+			current = args.State;
+			EventProcessed(this, args);
 		}
-
-		public virtual void RemoveTimer(State s)
-		{
-			timers.ClearTimer(s);
-		}
-
-		protected virtual void UpdateTimers()
-		{
-			// Only grab one timeout at a time, a flurry of timeouts isn't helpful
-			State timeout = timers.GetNextStateTimeout();
-			if (timeout != null)
-				eventHandler.AddEvent(new SingleStateEventInstance(timeout, TimeoutEvent));
-		}
-
-		#region StateBuilder forwarding and help
-		public IStateBuilder AddState(object identifier)
-		{
-			return rootBuilder.AddState(identifier);
-		}
-
-		public IStateBuilder DefaultTransition(object targetState)
-		{
-			return rootBuilder.DefaultTransition(targetState);
-		}
-
-		public IStateBuilder DefaultTransition(object targetState, Func<bool> guard)
-		{
-			return rootBuilder.DefaultTransition(targetState, guard);
-		}
-
-		internal State GetState(object identifier)
-		{
-			return root.GetState(identifier);
-		}
-		#endregion
 
 		public virtual void Dispose()
 		{
+		}
+
+		internal T GetPlugIn<T>()
+		{
+			return (T) plugins.Find(pi => pi is T);
 		}
 	}
 }

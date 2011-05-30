@@ -1,127 +1,119 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-
-using Moe.StateMachine;
 
 namespace Moe.StateMachine.Tests
 {
 	[TestFixture]
     public class TestStateCreation
-    {
+	{
+		private StateMachineBuilder smb;
+
+		[SetUp]
+		public void Setup()
+		{
+			smb = new StateMachineBuilder();
+		}
+
 		[Test]
         public void Test_Create_SimpleMachine()
         {
-			StateMachine sm = new StateMachine();
-        	sm.AddState(States.Green);
+        	smb.AddState(States.Green);
 
-			Assert.IsNotNull(sm[States.Green]);
+			Assert.IsNotNull(smb[States.Green]);
         }
 
 		[Test]
 		[ExpectedException(typeof(InvalidOperationException))]
 		public void Test_Create_StateUniqueness()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green);
-			sm.AddState(States.Green);
+			smb.AddState(States.Green);
+			smb.AddState(States.Green);
 		}
 
 		[Test]
 		[ExpectedException(typeof(InvalidOperationException))]
 		public void Test_Create_StateUniqueness_EntireStateMachine()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green).AddState(States.Red);
-			sm.AddState(States.Red);
+			smb.AddState(States.Green).AddState(States.Red);
+			smb.AddState(States.Red);
 		}
 
 		[Test]
 		public void Test_Create_TwoStates()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green);
-			sm.AddState(States.Red);
+			smb.AddState(States.Green);
+			smb.AddState(States.Red);
 
-			Assert.IsNotNull(sm[States.Green]);
-			Assert.IsNotNull(sm[States.Red]);
+			Assert.IsNotNull(smb[States.Green]);
+			Assert.IsNotNull(smb[States.Red]);
 		}
 
 		[Test]
 		public void Test_Create_TwoStates_WithTransition()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green);
-			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Green);
+			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			Assert.IsNotNull(sm[States.Green]);
-			Assert.IsNotNull(sm[States.Red]);
+			Assert.IsNotNull(smb[States.Green]);
+			Assert.IsNotNull(smb[States.Red]);
 		}
 
 		[Test]
 		public void Test_Create_CanCreateTransitionBeforeStateDefined()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green).TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red);
+			smb.AddState(States.Green).TransitionTo(Events.Change, States.Red);
+			smb.AddState(States.Red);
 
-			Assert.IsNotNull(sm[States.Green]);
-			Assert.IsNotNull(sm[States.Red]);
+			Assert.IsNotNull(smb[States.Green]);
+			Assert.IsNotNull(smb[States.Red]);
 		}
 
 		[Test]
 		public void Test_Create_InitialState()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green);
-			sm.AddState(States.Red);
+			smb.AddState(States.Green);
+			smb.AddState(States.Red);
 
-			sm.DefaultTransition(States.Red);
+			smb.DefaultTransition(States.Red);
 		}
 
 		[Test]
 		public void Test_Create_Heirarchy_ParentChild()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green)
+			smb.AddState(States.Green)
 				.AddState(States.GreenChild);
 
-			sm.AddState(States.Red);
+			smb.AddState(States.Red);
 
-			sm.DefaultTransition(States.Red);
+			smb.DefaultTransition(States.Red);
 		}
 
 		[Test]
 		public void Test_State_ContainsState()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green)
+			smb.AddState(States.Green)
 				.AddState(States.GreenChild);
 
-			sm.AddState(States.Red);
+			smb.AddState(States.Red);
 
-			Assert.AreEqual(sm[States.GreenChild].Id, States.GreenChild);
+			Assert.AreEqual(smb[States.GreenChild].Id, States.GreenChild);
 		}
 
 		[Test]
 		public void Test_State_CreateDeepByIndexers()
 		{
-			StateMachine sm = new StateMachine();
-			sm[States.Green][States.GreenChild][States.Red].InitialState();
-			Assert.IsNotNull(sm[States.Green][States.GreenChild][States.Red].Id);
+			smb[States.Green][States.GreenChild][States.Red].InitialState();
+			Assert.IsNotNull(smb[States.Green][States.GreenChild][States.Red].Id);
 		}
 
 		[Test]
 		public void Test_ShortCircuitIndexer_CreatesState()
 		{
-			StateMachine sm = new StateMachine();
-			Assert.IsNotNull(sm[States.Green]);
-			Assert.IsNotNull(sm[States.Green][States.GreenChild]);
-			Assert.IsNotNull(sm[States.Yellow]);
+			Assert.IsNotNull(smb[States.Green]);
+			Assert.IsNotNull(smb[States.Green][States.GreenChild]);
+			Assert.IsNotNull(smb[States.Yellow]);
 
-			Assert.IsNotNull(sm[States.GreenChild]);
+			Assert.IsNotNull(smb[States.GreenChild]);
 		}
 	}
 }

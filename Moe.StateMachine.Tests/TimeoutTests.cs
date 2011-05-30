@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Moe.StateMachine.Extensions.Timers;
 using NUnit.Framework;
 
 namespace Moe.StateMachine.Tests
@@ -9,21 +6,29 @@ namespace Moe.StateMachine.Tests
 	[TestFixture]
 	public class TimeoutTests
 	{
+		private StateMachineBuilder smb;
+
+		[SetUp]
+		public void Setup()
+		{
+			smb = new StateMachineBuilder();
+		}
+
 		[Test]
 		public void Test_TimeoutEvent_TimeoutFires()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green)
+			smb.AddState(States.Green)
 				.TransitionTo(Events.Change, States.Yellow)
 				.Timeout(100, States.Red)
 				.InitialState();
-			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
+			var sm = new StateMachine(smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
-			System.Threading.Thread.Sleep(110);
+			System.Threading.Thread.Sleep(150);
 			sm.PostEvent(Events.Pulse);
 			Assert.IsTrue(sm.InState(States.Red));
 		}
@@ -31,14 +36,14 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_TimeoutEvent_TimeoutClearsOnExitState()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green)
+			smb.AddState(States.Green)
 				.TransitionTo(Events.Change, States.Yellow)
 				.Timeout(100, States.Red)
 				.InitialState();
-			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
+			var sm = new StateMachine(smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -52,14 +57,14 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_ConditionalTimeoutEvent_TimeoutClearsAfterFailedEval()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green)
+			smb.AddState(States.Green)
 				.TransitionTo(Events.Change, States.Yellow)
 				.Timeout(100, States.Red, () => false)
 				.InitialState();
-			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
+			var sm = new StateMachine(smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -71,44 +76,40 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_TimeoutEvent_MultipleTimeoutFiresOnSuperstate()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green)
+			smb.AddState(States.Green)
 				.TransitionTo(Events.Change, States.Yellow)
 				.Timeout(200, States.Red)
 				.InitialState()
 					.AddState(States.GreenChild)
 					.Timeout(100, States.Yellow, () => false)
 					.InitialState();
-			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
+			var sm = new StateMachine(smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
 			System.Threading.Thread.Sleep(210);
-
-			// Pulse twice
-			sm.Pulse();
-			sm.Pulse();
 			Assert.IsTrue(sm.InState(States.Red));
 		}
 
 		[Test]
 		public void Test_TimeoutEvent_TimerAddedAfterLaterTimerInSuperstate()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Red);
-			sm.AddState(States.Gold);
-			sm.AddState(States.Green)
+			smb.AddState(States.Red);
+			smb.AddState(States.Gold);
+			smb.AddState(States.Green)
 				.InitialState()
 				.Timeout(500, States.Red);
-			sm[States.Green][States.GreenChild]
+			smb[States.Green][States.GreenChild]
 				.InitialState()
 				.Timeout(50, States.Red)
 				.TransitionTo(Events.Change, States.GreenChild2);
-			sm[States.Green][States.GreenChild2]
+			smb[States.Green][States.GreenChild2]
 				.Timeout(200, States.Gold);
 
+			var sm = new StateMachine(smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.GreenChild));
@@ -121,20 +122,20 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_TimeoutEvent_SubstatesSwappingSuperstateTimesOut()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Red);
-			sm.AddState(States.Gold);
-			sm.AddState(States.Green)
+			smb.AddState(States.Red);
+			smb.AddState(States.Gold);
+			smb.AddState(States.Green)
 				.InitialState()
 				.Timeout(300, States.Gold);
-			sm[States.Green][States.GreenChild]
+			smb[States.Green][States.GreenChild]
 				.InitialState()
 				.Timeout(1000, States.Red)
 				.TransitionTo(Events.Change, States.GreenChild2);
-			sm[States.Green][States.GreenChild2]
+			smb[States.Green][States.GreenChild2]
 				.Timeout(1000, States.Red)
 				.TransitionTo(Events.Change, States.GreenChild);
 
+			var sm = new StateMachine(smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.GreenChild));

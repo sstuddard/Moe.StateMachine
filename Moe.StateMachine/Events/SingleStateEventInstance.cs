@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Moe.StateMachine.States;
+﻿using Moe.StateMachine.States;
 using Moe.StateMachine.Transitions;
 
 namespace Moe.StateMachine.Events

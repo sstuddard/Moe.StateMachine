@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Moe.StateMachine.Actions;
-using Moe.StateMachine.Events;
 using Moe.StateMachine.Extensions;
 using NUnit.Framework;
-using Moe.StateMachine;
 
 namespace Moe.StateMachine.Tests
 {
@@ -14,21 +9,23 @@ namespace Moe.StateMachine.Tests
 	public class TestSimpleTransitions
 	{
 		private List<string> events;
+		private StateMachineBuilder smb;
 
 		[SetUp]
 		public void Setup()
 		{
 			events = new List<string>();
+			smb = new StateMachineBuilder();
 		}
 
 		[Test]
 		public void Test_Transitions_DefaultTransition()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green).TransitionTo(Events.Change, States.Yellow).InitialState();
-			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Green).TransitionTo(Events.Change, States.Yellow).InitialState();
+			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
+			StateMachine sm = new StateMachine(smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -37,11 +34,11 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_Transitions_BasicTransitions()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green).TransitionTo(Events.Change, States.Yellow).InitialState();
-			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Green).TransitionTo(Events.Change, States.Yellow).InitialState();
+			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
+			StateMachine sm = new StateMachine(smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -54,14 +51,14 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_Transitions_MultiTransitionFromState()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green)
+			smb.AddState(States.Green)
 				.TransitionTo(Events.Change, States.Yellow)
 				.TransitionTo(Events.Panic, States.Red)
 				.InitialState();
-			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
+			StateMachine sm = new StateMachine(smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -80,11 +77,11 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_Transitions_BasicTransitions_EnterActions()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green).OnEnter(tr => CaptureState("Enter", States.Green)).TransitionTo(Events.Change, States.Yellow).InitialState();
-			sm.AddState(States.Yellow).OnEnter(tr => CaptureState("Enter", States.Yellow)).TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red).OnEnter(tr => CaptureState("Enter", States.Red)).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Green).OnEnter(tr => CaptureState("Enter", States.Green)).TransitionTo(Events.Change, States.Yellow).InitialState();
+			smb.AddState(States.Yellow).OnEnter(tr => CaptureState("Enter", States.Yellow)).TransitionTo(Events.Change, States.Red);
+			smb.AddState(States.Red).OnEnter(tr => CaptureState("Enter", States.Red)).TransitionTo(Events.Change, States.Green);
 
+			StateMachine sm = new StateMachine(smb);
 			sm.Start();
 
 			sm.PostEvent(Events.Change);
@@ -102,11 +99,11 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_Transitions_BasicTransitions_ExitActions()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green).OnExit(tr => CaptureState("Exit", States.Green)).TransitionTo(Events.Change, States.Yellow).InitialState();
-			sm.AddState(States.Yellow).OnExit(tr => CaptureState("Exit", States.Yellow)).TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red).OnExit(tr => CaptureState("Exit", States.Red)).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Green).OnExit(tr => CaptureState("Exit", States.Green)).TransitionTo(Events.Change, States.Yellow).InitialState();
+			smb.AddState(States.Yellow).OnExit(tr => CaptureState("Exit", States.Yellow)).TransitionTo(Events.Change, States.Red);
+			smb.AddState(States.Red).OnExit(tr => CaptureState("Exit", States.Red)).TransitionTo(Events.Change, States.Green);
 
+			StateMachine sm = new StateMachine(smb);
 			sm.Start();
 
 			sm.PostEvent(Events.Change);
@@ -123,12 +120,12 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_Transitions_BasicTransitions_Conditional()
 		{
-			StateMachine sm = new StateMachine();
 			bool allow = false;
-			sm.AddState(States.Green).TransitionTo(Events.Change, States.Yellow, () => { return allow; }).InitialState();
-			sm.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Green).TransitionTo(Events.Change, States.Yellow, () => { return allow; }).InitialState();
+			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
+			StateMachine sm = new StateMachine(smb);
 			sm.Start();
 
 			// Transition should not go
@@ -143,17 +140,17 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_Transitions_EntryExit_WithContext()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.Green)
+			smb.AddState(States.Green)
 				.TransitionTo(Events.Change, States.Yellow)
 				.OnExit(CaptureEvent)
 				.InitialState();
-			sm.AddState(States.Yellow)
+			smb.AddState(States.Yellow)
 				.TransitionTo(Events.Change, States.Red);
-			sm.AddState(States.Red)
+			smb.AddState(States.Red)
 				.OnEnter(CaptureEvent)
 				.TransitionTo(Events.Change, States.Green);
 
+			StateMachine sm = new StateMachine(smb);
 			sm.Start();
 
 			var lookup = new Dictionary<string, string>();

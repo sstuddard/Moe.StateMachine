@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Moe.StateMachine.Actions;
 using Moe.StateMachine.Events;
 using Moe.StateMachine.Transitions;
 
@@ -41,7 +37,7 @@ namespace Moe.StateMachine.States
 			// Traverse down to children?
 			foreach (State substate in Substates)
 			{
-				if (substate.ContainsState(transition.TargetState.Id))
+				if (substate.ContainsState(transition.TargetState))
 				{
 					return substate.Accept(transition);
 				}

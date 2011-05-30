@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Moe.StateMachine.Events;
 using Moe.StateMachine.States;
 
@@ -11,7 +8,7 @@ namespace Moe.StateMachine.Transitions
 	{
 		private Func<bool> guard;
 
-		public GuardedTransition(State sourceState, object eventTarget, StateLocator targetState, Func<bool> guard)
+		public GuardedTransition(State sourceState, object eventTarget, State targetState, Func<bool> guard)
 			: base(sourceState, eventTarget, targetState)
 		{
 			this.guard = guard;

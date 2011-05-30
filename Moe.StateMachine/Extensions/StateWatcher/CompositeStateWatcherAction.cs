@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Moe.StateMachine.Actions;
 using Moe.StateMachine.States;
 
 namespace Moe.StateMachine.Extensions.StateWatcher
@@ -26,11 +23,10 @@ namespace Moe.StateMachine.Extensions.StateWatcher
 			
 			foreach (object stateId in states)
 			{
-				State state = stateMachine[stateId].State;
+				State state = stateMachine[stateId];
 				StateWatcherAction action = new StateWatcherAction(state);
 				action.Performed += OnStateEntered;
 
-				stateMachine.StateActions.AddAction(state, action);
 				stateActions.Add(action);
 			}
 		}
@@ -40,7 +36,7 @@ namespace Moe.StateMachine.Extensions.StateWatcher
 			// Remove all actions, we're done
 			foreach (StateWatcherAction action in stateActions)
 			{
-				stateMachine.StateActions.RemoveAction(action);
+				action.Dispose();
 			}
 		}
 

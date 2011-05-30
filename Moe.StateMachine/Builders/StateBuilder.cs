@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Moe.StateMachine.Actions;
 using Moe.StateMachine.Builders;
 using Moe.StateMachine.States;
 using Moe.StateMachine.Transitions;
@@ -9,101 +8,163 @@ namespace Moe.StateMachine
 {
 	public class StateBuilder : IStateBuilder
 	{
-		private readonly State state;
-		private readonly StateMachine stateMachine;
+		protected readonly List<IStateBuilder> substates;
+		protected readonly List<Action<State>> secondPassActions;
+		protected State state;
 
-		public StateBuilder(StateMachine stateMachine, object stateId, State parent)
+		public StateBuilder(IStateBuilder parent, object stateId, IStateBuilderContext context)
 		{
-			this.stateMachine = stateMachine;
-			this.state = CreateState(stateId, parent);
+			Parent = parent;
+			Id = stateId;
+			Context = context;
+
+			substates = new List<IStateBuilder>();
+			secondPassActions = new List<Action<State>>();
 		}
 
-		public StateBuilder(StateMachine stateMachine, State state)
+		public virtual State Build(State parent)
 		{
-			this.state = state;
-			this.stateMachine = stateMachine;
+			// Build is called twice, first time around we build just the state
+			if (state == null)
+			{
+				state = CreateState(Id, parent);
+
+				foreach (IStateBuilder substate in substates)
+				{
+					state.AddChildState(substate.Build(state));
+				}
+			}
+			else
+			{
+				foreach (Action<State> action in secondPassActions)
+				{
+					action(state);
+				}
+			}
+
+			return state;
 		}
 
-		public object Id { get { return state.Id; } }
-		public State State { get { return state; } }
-		public StateMachine StateMachine { get { return stateMachine; } }
+		public IStateBuilderContext Context { get; private set; }
+		public object Id { get; private set; }
+		public IStateBuilder Parent { get; private set; }
+		public IEnumerable<IStateBuilder> SubStates { get { return new List<IStateBuilder>(substates); } }
 
-		public static implicit operator State(StateBuilder builder)
+		public void AddSecondPassAction(Action<State> action)
 		{
-			return builder.State;
+			secondPassActions.Add(action);
 		}
 
+		/// <summary>
+		/// Short circuit indexer.  This will fetch ANY state by id if it exists.
+		/// If it doesn't exist, it will be created off the root state.  
+		/// Statebuilder does NOT work the same way.
+		/// </summary>
+		/// <param name="idx">State ID</param>
+		/// <returns></returns>
 		public virtual IStateBuilder this[object idx]
 		{
 			get
 			{
-				if (!state.ContainsState(idx))
+				if (!this.ContainsState(idx))
 					AddState(idx);
-				return stateMachine.CreateStateBuilder(state.GetState(idx));
+				return this.GetState(idx);
 			}
 		}
 
 		public virtual State CreateState(object stateId, State parent)
 		{
+			if (parent == null)
+				throw new InvalidOperationException("Parent may not be null for state: " + stateId);
 			return new State(stateId, parent);
+		}
+
+		public virtual Transition CreateTransition(TransitionSpec spec)
+		{
+			return spec.CreateTransition(Context);
 		}
 
 		#region Builder methods
 		public virtual IStateBuilder DefaultTransition(object targetState)
 		{
-			return new TransitionBuilder(this).DefaultTransition(targetState);
+			return TransitionTo(StateMachine.DefaultEntryEvent, targetState);
 		}
 
 		public virtual IStateBuilder DefaultTransition(object targetState, Func<bool> guard)
 		{
-			return new TransitionBuilder(this).DefaultTransition(targetState, guard);
+			return TransitionTo(StateMachine.DefaultEntryEvent, targetState, guard);
 		}
 
 		public virtual IStateBuilder TransitionTo(object eventTarget, object targetState)
 		{
-			return new TransitionBuilder(this).TransitionTo(eventTarget, targetState);
+			var transitionSpec = new TransitionSpec(Id, eventTarget, targetState);
+			secondPassActions.Add(s => s.AddTransition(transitionSpec.CreateTransition(Context)));
+			return this;
 		}
 
 		public virtual IStateBuilder TransitionTo(object eventTarget, object targetState, Func<bool> guard)
 		{
-			return new TransitionBuilder(this).TransitionTo(eventTarget, targetState, guard);
+			var transitionSpec = new GuardedTransitionSpec(Id, eventTarget, targetState, guard);
+			secondPassActions.Add(s => s.AddTransition(transitionSpec.CreateTransition(Context)));
+			return this;
 		}
 
 		public virtual IStateBuilder InitialState()
 		{
-			return new TransitionBuilder(this).InitialState();
-		}
-
-		public virtual IStateBuilder Timeout(int timeoutInMilliseconds, object targetState)
-		{
-			return new TimerBuilder(this).Timeout(timeoutInMilliseconds, targetState);
-		}
-
-		public virtual IStateBuilder Timeout(int timeoutInMilliseconds, object targetState, Func<bool> guard)
-		{
-			return new TimerBuilder(this).Timeout(timeoutInMilliseconds, targetState, guard);
-		}
-
-		public virtual IStateBuilder OnEnter(Action<TransitionReceipt> action)
-		{
-			return new ActionBuilder(this).OnEnter(action);
-		}
-
-		public virtual IStateBuilder OnExit(Action<TransitionReceipt> action)
-		{
-			return new ActionBuilder(this).OnExit(action);
+			Parent.DefaultTransition(Id);
+			return this;
 		}
 
 		public virtual IStateBuilder AddState(object newStateId)
 		{
-			if (stateMachine.GetState(newStateId) != null)
+			if (this.GetState(newStateId) != null)
 				throw new InvalidOperationException();
 
-			State newState = CreateState(newStateId, state);
-			state.AddChildState(newState);
+			IStateBuilder newState = CreateStateBuilder(newStateId, this);
+			substates.Add(newState);
 
-			return stateMachine.CreateStateBuilder(newState);
+			return newState;
+		}
+
+		public virtual IStateBuilder CreateStateBuilder(object stateId, IStateBuilder parent)
+		{
+			return new StateBuilder(parent, stateId, Context);
 		}
 		#endregion
+	}
+
+	public class TransitionSpec
+	{
+		public object SourceState { get; private set; }
+		public object Event { get; private set; }
+		public object TargetState { get; private set; }
+
+		public TransitionSpec(object source, object eventType, object target)
+		{
+			SourceState = source;
+			Event = eventType;
+			TargetState = target;
+		}
+
+		public virtual Transition CreateTransition(IStateBuilderContext context)
+		{
+			return new Transition(context.Resolve(SourceState), Event, context.Resolve(TargetState));
+		}
+	}
+
+	public class GuardedTransitionSpec : TransitionSpec
+	{
+		public Func<bool> Guard { get; private set; }
+
+		public GuardedTransitionSpec(object source, object eventType, object target, Func<bool> guard)
+			: base(source, eventType, target)
+		{
+			Guard = guard;
+		}
+
+		public override Transition CreateTransition(IStateBuilderContext context)
+		{
+			return new GuardedTransition(context.Resolve(SourceState), Event, context.Resolve(TargetState), Guard);
+		}
 	}
 }

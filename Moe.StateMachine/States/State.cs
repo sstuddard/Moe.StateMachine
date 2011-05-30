@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Moe.StateMachine.Actions;
 using Moe.StateMachine.Events;
 using Moe.StateMachine.Transitions;
 
@@ -8,41 +7,41 @@ namespace Moe.StateMachine.States
 {
 	public class State
 	{
-		public event EventHandler<StateEventArgs> Entered;
-		public event EventHandler<StateEventArgs> Exited;
+		public event EventHandler<StateTransitionEventArgs> Entered;
+		public event EventHandler<StateTransitionEventArgs> Exited;
 
 		private State parent;
 		private object id;
-		private Dictionary<object, State> substates;
+		private List<State> substates;
 		protected TransitionDirector transitions;
 
 		public State(object id, State parent)
 		{
 			this.id = id;
 			this.parent = parent;
-			this.substates = new Dictionary<object, State>();
+			this.substates = new List<State>();
 			this.transitions = new TransitionDirector();
 		}
 
 		public object Id { get { return id; } }
-		public IEnumerable<State> Substates { get { return substates.Values; } }
+		public IEnumerable<State> Substates { get { return new List<State>(substates); } }
 		public State Parent { get { return parent; } }
 
 		public void AddChildState(State substate)
 		{
-			substates[substate.Id] = substate;
+			substates.Add(substate);
 		}
 
 		protected virtual void Enter(TransitionEvent transition)
 		{
 			if (Entered != null)
-				Entered(this, new StateEventArgs(transition));
+				Entered(this, new StateTransitionEventArgs(transition));
 		}
 
 		protected virtual void Exit(TransitionEvent transition)
 		{
 			if (Exited != null)
-				Exited(this, new StateEventArgs(transition));
+				Exited(this, new StateTransitionEventArgs(transition));
 		}
 
 		public void AddTransition(Transition transition)
@@ -85,7 +84,7 @@ namespace Moe.StateMachine.States
 				return DispatchDefaults();
 			}
 
-			if (this.ContainsState(transitionEvent.TargetState.Id))
+			if (this.ContainsState(transitionEvent.TargetState))
 				return TraverseDown(transitionEvent);
 
 			return TraverseUp(transitionEvent);
@@ -94,13 +93,11 @@ namespace Moe.StateMachine.States
 		protected virtual State TraverseDown(TransitionEvent transitionEvent)
 		{
 			// Traverse down to children?
-			foreach (State substate in substates.Values)
+			State substate = this.GetSubstatePath(transitionEvent.TargetState);
+			if (substate != null)
 			{
-				if (substate.ContainsState(transitionEvent.TargetState.Id))
-				{
-					Enter(transitionEvent);
-					return substate.Accept(transitionEvent);
-				}
+				Enter(transitionEvent);
+				return substate.Accept(transitionEvent);
 			}
 
 			// Definitely, should never happen.
@@ -115,7 +112,19 @@ namespace Moe.StateMachine.States
 
 		internal virtual State DispatchDefaults()
 		{
-			return ProcessEvent(this, new SingleStateEventInstance(this, StateMachine.DefaultEntryEvent));
+			var eventToProcess = new SingleStateEventInstance(this, StateMachine.DefaultEntryEvent);
+			Transition transition = transitions.MatchTransition(eventToProcess);
+			if (transition != null)
+			{
+				TransitionEvent transitionEvent = new TransitionEvent(transition, eventToProcess);
+				State substate = this.GetSubstatePath(transition.TargetState);
+				if (substate != null)
+					return substate.Accept(transitionEvent);
+
+				throw new InvalidOperationException("Invalid default transition");
+			}
+
+			return this;
 		}
 	}
 }

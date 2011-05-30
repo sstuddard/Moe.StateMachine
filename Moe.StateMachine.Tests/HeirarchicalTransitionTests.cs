@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Moe.StateMachine.Actions;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace Moe.StateMachine.Tests
@@ -11,21 +7,23 @@ namespace Moe.StateMachine.Tests
 	public class TestHeirarchicalTransitions
 	{
 		private List<string> events;
+		private StateMachineBuilder smb;
 
 		[SetUp]
 		public void Setup()
 		{
 			events = new List<string>();
+			smb = new StateMachineBuilder();
 		}
 
 		[Test]
 		public void Test_DefaultTransition_Multiple_Entry()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.GreenParent).InitialState()
+			smb.AddState(States.GreenParent).InitialState()
 				.AddState(States.GreenChild).InitialState();
-			sm.AddState(States.RedParent);
+			smb.AddState(States.RedParent);
 
+			StateMachine sm = new StateMachine(smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.GreenParent));
@@ -35,11 +33,11 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_Transition_ToSuperstateWithDefault()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.GreenParent)
+			smb.AddState(States.GreenParent)
 				.AddState(States.GreenChild).InitialState();
-			sm.AddState(States.RedParent).TransitionTo(Events.Change, States.GreenParent).InitialState();
+			smb.AddState(States.RedParent).TransitionTo(Events.Change, States.GreenParent).InitialState();
 
+			StateMachine sm = new StateMachine(smb);
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.RedParent));
@@ -50,8 +48,7 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_Transition_ThreeLevelToTwoLevelTransition()
 		{
-			StateMachine sm = new StateMachine();
-			sm.AddState(States.GreenParent)
+			smb.AddState(States.GreenParent)
 				.OnEnter(tr => OnEnter(States.GreenParent))
 				.OnExit(tr => OnExit(States.GreenParent))
 				.InitialState()
@@ -64,13 +61,14 @@ namespace Moe.StateMachine.Tests
 							.TransitionTo(Events.Change, States.RedChild)
 							.OnEnter(tr => OnEnter(States.GreenGrandChild))
 							.OnExit(tr => OnExit(States.GreenGrandChild));
-			sm.AddState(States.RedParent)
+			smb.AddState(States.RedParent)
 				.OnEnter(tr => OnEnter(States.RedParent))
 				.OnExit(tr => OnExit(States.RedParent))
 				.AddState(States.RedChild)
 					.OnEnter(tr => OnEnter(States.RedChild))
 					.OnExit(tr => OnExit(States.RedChild));
 
+			StateMachine sm = new StateMachine(smb);
 			sm.Start();
 
 			events.Clear();

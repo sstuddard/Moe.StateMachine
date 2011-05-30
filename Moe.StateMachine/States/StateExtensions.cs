@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Moe.StateMachine.States
 {
@@ -33,9 +30,9 @@ namespace Moe.StateMachine.States
 			}
 		}
 
-		public static bool ContainsState(this State s, object stateId)
+		public static bool ContainsState(this State s, State state)
 		{
-			return s.GetState(stateId) != null;
+			return s.GetState(state.Id) != null;
 		}
 
 		public static void VisitParentChain(this State s, Action<State> action)
@@ -45,6 +42,17 @@ namespace Moe.StateMachine.States
 
 			action(s);
 			VisitParentChain(s.Parent, action);
+		}
+
+		public static State GetSubstatePath(this State s, State targetState)
+		{
+			foreach (State substate in s.Substates)
+			{
+				if (substate.ContainsState(targetState))
+					return substate;
+			}
+
+			return null;
 		}
 	}
 }

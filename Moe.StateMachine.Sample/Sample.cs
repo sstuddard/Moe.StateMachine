@@ -6,6 +6,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Moe.StateMachine.Builders;
+using Moe.StateMachine.Extensions.Asynchronous;
+using Moe.StateMachine.Extensions.Timers;
 
 namespace Moe.StateMachine.Sample
 {
@@ -23,6 +26,7 @@ namespace Moe.StateMachine.Sample
 			Change
 		}
 
+		private StateMachineBuilder stateMachineBuilder;
 		private StateMachine stateMachine;
 		private readonly Color GreenOff = Color.FromArgb(192, 255, 192);
 		private readonly Color GreenOn = Color.Lime;
@@ -35,23 +39,26 @@ namespace Moe.StateMachine.Sample
 		{
 			InitializeComponent();
 
-			stateMachine = new AsyncStateMachine();
-			stateMachine.AddState(States.Green)
+			stateMachineBuilder = new StateMachineBuilder();
+			stateMachineBuilder.AddState(States.Green)
 				.TransitionTo(Events.Change, States.Yellow)
 				.OnEnter(s => pnlGreen.BackColor = GreenOn)
 				.OnExit(s => pnlGreen.BackColor = GreenOff)
 				.Timeout(3000, States.Yellow)
 				.InitialState();
-			stateMachine.AddState(States.Yellow)
+			stateMachineBuilder.AddState(States.Yellow)
 				.TransitionTo(Events.Change, States.Red)
 				.Timeout(3000, States.Red)
 				.OnEnter(s => pnlYellow.BackColor = YellowOn)
 				.OnExit(s => pnlYellow.BackColor = YellowOff);
-			stateMachine.AddState(States.Red)
+			stateMachineBuilder.AddState(States.Red)
 				.TransitionTo(Events.Change, States.Green)
 				.Timeout(3000, States.Green)
 				.OnEnter(s => pnlRed.BackColor = RedOn)
 				.OnExit(s => pnlRed.BackColor = RedOff);
+
+			stateMachine = new StateMachine(stateMachineBuilder);
+			stateMachine.Asynchronous();
 		}
 
 		private void btnStart_Click(object sender, EventArgs e)
