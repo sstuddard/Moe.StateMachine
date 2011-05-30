@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="ComplexTransitionTests.cs" />
     <Compile Include="HeirarchicalTransitionTests.cs" />
+    <Compile Include="HistoryStateTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleTransitionTests.cs" />
     <Compile Include="StateCreationTests.cs" />

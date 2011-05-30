@@ -70,10 +70,12 @@
   <ItemGroup>
     <Compile Include="Builders\IStateBuilder.cs" />
     <Compile Include="Builders\IStateBuilderContext.cs" />
+    <Compile Include="Builders\ITransitionBuilder.cs" />
     <Compile Include="Builders\StateBuilder.cs" />
     <Compile Include="Builders\StateBuilderContext.cs" />
     <Compile Include="Builders\StateBuilderExtensions.cs" />
     <Compile Include="Builders\StateMachineBuilder.cs" />
+    <Compile Include="Builders\TransitionBuilder.cs" />
     <Compile Include="Events\EventInstance.cs" />
     <Compile Include="Events\EventProcessor.cs" />
     <Compile Include="Events\SynchronousEventProcessor.cs" />

@@ -35,7 +35,7 @@ namespace Moe.StateMachine.Tests
 		{
 			smb.AddState(States.GreenParent)
 				.AddState(States.GreenChild).InitialState();
-			smb.AddState(States.RedParent).TransitionTo(Events.Change, States.GreenParent).InitialState();
+			smb.AddState(States.RedParent).TransitionOn(Events.Change, States.GreenParent).InitialState();
 
 			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
@@ -58,7 +58,7 @@ namespace Moe.StateMachine.Tests
 					.InitialState()
 						.AddState(States.GreenGrandChild)
 							.InitialState()
-							.TransitionTo(Events.Change, States.RedChild)
+							.TransitionOn(Events.Change, States.RedChild)
 							.OnEnter(tr => OnEnter(States.GreenGrandChild))
 							.OnExit(tr => OnExit(States.GreenGrandChild));
 			smb.AddState(States.RedParent)

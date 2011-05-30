@@ -52,7 +52,7 @@ namespace Moe.StateMachine.Tests
 		public void Test_Create_TwoStates_WithTransition()
 		{
 			smb.AddState(States.Green);
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			Assert.IsNotNull(smb[States.Green]);
 			Assert.IsNotNull(smb[States.Red]);
@@ -61,7 +61,7 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_Create_CanCreateTransitionBeforeStateDefined()
 		{
-			smb.AddState(States.Green).TransitionTo(Events.Change, States.Red);
+			smb.AddState(States.Green).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red);
 
 			Assert.IsNotNull(smb[States.Green]);

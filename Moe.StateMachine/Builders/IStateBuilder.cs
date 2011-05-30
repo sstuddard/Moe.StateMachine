@@ -17,13 +17,13 @@ namespace Moe.StateMachine
 
 		// State building
 		IStateBuilder AddState(object stateId);
+//		IStateBuilder AddHistory();
 		IStateBuilder this[object stateId] { get; }
 
 		// Transition support
-		IStateBuilder DefaultTransition(object targetState);
-		IStateBuilder DefaultTransition(object targetState, Func<bool> guard);
-		IStateBuilder TransitionTo(object eventTarget, object targetState);
-		IStateBuilder TransitionTo(object eventTarget, object targetState, Func<bool> guard);
+		ITransitionBuilder DefaultTransition(object targetState);
+		ITransitionBuilder TransitionOn(object eventTarget);
+		ITransitionBuilder TransitionOn(object eventTarget, object targetState);
 		IStateBuilder InitialState();
 	}
 }

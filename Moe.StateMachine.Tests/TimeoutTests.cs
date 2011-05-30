@@ -23,11 +23,11 @@ namespace Moe.StateMachine.Tests
 		public void Test_TimeoutEvent_TimeoutFires()
 		{
 			smb.AddState(States.Green)
-				.TransitionTo(Events.Change, States.Yellow)
+				.TransitionOn(Events.Change, States.Yellow)
 				.Timeout(100, States.Red)
 				.InitialState();
-			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			var sm = new StateMachine("Test", smb).Asynchronous().Logger(new ConsoleLogger());
 			sm.Start();
@@ -41,11 +41,11 @@ namespace Moe.StateMachine.Tests
 		public void Test_TimeoutEvent_TimeoutClearsOnExitState()
 		{
 			smb.AddState(States.Green)
-				.TransitionTo(Events.Change, States.Yellow)
+				.TransitionOn(Events.Change, States.Yellow)
 				.Timeout(100, States.Red)
 				.InitialState();
-			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			var sm = new StateMachine("Test", smb);
 			sm.Start();
@@ -61,11 +61,11 @@ namespace Moe.StateMachine.Tests
 		public void Test_ConditionalTimeoutEvent_TimeoutClearsAfterFailedEval()
 		{
 			smb.AddState(States.Green)
-				.TransitionTo(Events.Change, States.Yellow)
+				.TransitionOn(Events.Change, States.Yellow)
 				.Timeout(100, States.Red, () => false)
 				.InitialState();
-			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			var sm = new StateMachine("Test", smb).Asynchronous();
 			sm.Start();
@@ -79,14 +79,14 @@ namespace Moe.StateMachine.Tests
 		public void Test_TimeoutEvent_MultipleTimeoutFiresOnSuperstate()
 		{
 			smb.AddState(States.Green)
-				.TransitionTo(Events.Change, States.Yellow)
+				.TransitionOn(Events.Change, States.Yellow)
 				.Timeout(200, States.Red)
 				.InitialState()
 					.AddState(States.GreenChild)
 					.Timeout(100, States.Yellow, () => false)
 					.InitialState();
-			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			var sm = new StateMachine("Test", smb).Asynchronous();
 			sm.Start();
@@ -107,7 +107,7 @@ namespace Moe.StateMachine.Tests
 			smb[States.Green][States.GreenChild]
 				.InitialState()
 				.Timeout(50, States.Red)
-				.TransitionTo(Events.Change, States.GreenChild2);
+				.TransitionOn(Events.Change, States.GreenChild2);
 			smb[States.Green][States.GreenChild2]
 				.Timeout(200, States.Gold);
 
@@ -131,10 +131,10 @@ namespace Moe.StateMachine.Tests
 			smb[States.Green][States.GreenChild]
 				.InitialState()
 				.Timeout(1000, States.Red)
-				.TransitionTo(Events.Change, States.GreenChild2);
+				.TransitionOn(Events.Change, States.GreenChild2);
 			smb[States.Green][States.GreenChild2]
 				.Timeout(1000, States.Red)
-				.TransitionTo(Events.Change, States.GreenChild);
+				.TransitionOn(Events.Change, States.GreenChild);
 
 			var sm = new StateMachine("Test", smb);
 			sm.Start();

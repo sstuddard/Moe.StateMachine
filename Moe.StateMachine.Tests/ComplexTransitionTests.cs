@@ -19,12 +19,12 @@ namespace Moe.StateMachine.Tests
 		{
 			smb.AddState(States.Green)
 				.InitialState()
-				.TransitionTo(Events.Change, States.Yellow)
+				.TransitionOn(Events.Change, States.Yellow)
 				.AddState(States.GreenChild)
 					.InitialState()
-					.TransitionTo(Events.Change, States.Red, () => false);
-			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Green);
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+					.TransitionOn(Events.Change, States.Red).When(() => false);
+			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Green);
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
@@ -40,11 +40,11 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Green).InitialState();
 			smb[States.Green]
 				.AddState(States.GreenChild)
-				.TransitionTo(Events.Change, States.GreenChild2)
+				.TransitionOn(Events.Change, States.GreenChild2)
 				.InitialState();
 			smb[States.Green]
 				.AddState(States.GreenChild2)
-				.TransitionTo(Events.Change, States.Green);
+				.TransitionOn(Events.Change, States.Green);
 
 			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
@@ -62,11 +62,11 @@ namespace Moe.StateMachine.Tests
 		{
 			bool flag = false;
 			smb.AddState(States.Green)
-				.TransitionTo(Events.Change, States.Yellow, () => flag)
-				.TransitionTo(Events.Change, States.Red, () => !flag)
+				.TransitionOn(Events.Change, States.Yellow).When(() => flag)
+				.TransitionOn(Events.Change, States.Red).When(() => !flag)
 				.InitialState();
-			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Green);
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Green);
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
@@ -85,11 +85,11 @@ namespace Moe.StateMachine.Tests
 		public void Test_MultipleGuardedDefaultTransitions()
 		{
 			bool flag = false;
-			smb.DefaultTransition(States.Green, () => flag);
-			smb.DefaultTransition(States.Red, () => !flag);
+			smb.DefaultTransition(States.Green).When(() => flag);
+			smb.DefaultTransition(States.Red).When(() => !flag);
 			smb.AddState(States.Green);
-			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Green);
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Green);
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();
@@ -101,9 +101,9 @@ namespace Moe.StateMachine.Tests
 		public void Test_ReentrantEventPosting()
 		{
 			StateMachine sm = null;
-			smb.AddState(States.Green).TransitionTo(Events.Change, States.Yellow).InitialState();
-			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red).OnEnter(s => sm.PostEvent(Events.Change));
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Green).TransitionOn(Events.Change, States.Yellow).InitialState();
+			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red).OnEnter(s => sm.PostEvent(Events.Change));
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			sm = new StateMachine("Test", smb);
 			sm.Start();
@@ -126,7 +126,7 @@ namespace Moe.StateMachine.Tests
 			smb[States.Green]
 				.OnEnter(tr => OnEnter(States.Green))
 				.OnExit(tr => OnExit(States.Green))
-				.TransitionTo(Events.Change, States.Green);
+				.TransitionOn(Events.Change, States.Green);
 
 			StateMachine sm = new StateMachine("Test", smb);
 			sm.Start();

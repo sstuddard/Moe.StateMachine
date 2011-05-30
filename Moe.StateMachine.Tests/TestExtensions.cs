@@ -18,9 +18,9 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_CreateBeforeStart_StateWatcher_OneState()
 		{
-			smb.AddState(States.Green).TransitionTo(Events.Change, States.Yellow).InitialState();
-			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Green).TransitionOn(Events.Change, States.Yellow).InitialState();
+			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			var sm = new StateMachine("Test", smb);
 			sm.AddStateWatcher(StateCallback, States.Red);
@@ -44,9 +44,9 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_CreateBeforeStart_StateWatcher_MultipleState()
 		{
-			smb.AddState(States.Green).TransitionTo(Events.Change, States.Yellow).InitialState();
-			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Green).TransitionOn(Events.Change, States.Yellow).InitialState();
+			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			var sm = new StateMachine("Test", smb);
 			sm.AddStateWatcher(StateCallback, States.Red, States.Yellow);
@@ -63,9 +63,9 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_CreateAfterStart_StateWatcher_OneState()
 		{
-			smb.AddState(States.Green).TransitionTo(Events.Change, States.Yellow).InitialState();
-			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Green).TransitionOn(Events.Change, States.Yellow).InitialState();
+			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			var sm = new StateMachine("Test", smb);
 			sm.Start();
@@ -94,9 +94,9 @@ namespace Moe.StateMachine.Tests
 		[Test]
 		public void Test_CreateAfterStart_StateWatcher_MultipleState()
 		{
-			smb.AddState(States.Green).TransitionTo(Events.Change, States.Yellow).InitialState();
-			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+			smb.AddState(States.Green).TransitionOn(Events.Change, States.Yellow).InitialState();
+			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			var sm = new StateMachine("Test", smb);
 			sm.Start();
@@ -119,9 +119,9 @@ namespace Moe.StateMachine.Tests
 		public void Test_CreateAfterStart_StateWatcher_OneSuperStateState()
 		{
 			smb.AddState(States.GreenParent).InitialState()
-				.AddState(States.Green).TransitionTo(Events.Change, States.Yellow).InitialState();
-			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
-			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
+				.AddState(States.Green).TransitionOn(Events.Change, States.Yellow).InitialState();
+			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
+			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
 			var sm = new StateMachine("Test", smb);
 			sm.Start();

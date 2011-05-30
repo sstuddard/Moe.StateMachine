@@ -8,7 +8,7 @@ namespace Moe.StateMachine.Extensions.Timers
 
 		public static IStateBuilder Timeout(this IStateBuilder builder, int timeoutInMilliseconds, object targetState)
 		{
-			builder.TransitionTo(TimeoutEvent, targetState);
+			builder.TransitionOn(TimeoutEvent, targetState);
 			AddTimeout(builder, timeoutInMilliseconds);
 			return builder;
 		}
@@ -16,7 +16,7 @@ namespace Moe.StateMachine.Extensions.Timers
 		public static IStateBuilder Timeout(this IStateBuilder builder, 
 			int timeoutInMilliseconds, object targetState, Func<bool> guard)
 		{
-			builder.TransitionTo(TimeoutEvent, targetState, guard);
+			builder.TransitionOn(TimeoutEvent).To(targetState).When(guard);
 			AddTimeout(builder, timeoutInMilliseconds);
 			return builder;
 		}

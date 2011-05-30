@@ -79,34 +79,20 @@ namespace Moe.StateMachine
 			return new State(stateId, parent);
 		}
 
-		public virtual Transition CreateTransition(TransitionSpec spec)
-		{
-			return spec.CreateTransition(Context);
-		}
-
 		#region Builder methods
-		public virtual IStateBuilder DefaultTransition(object targetState)
+		public virtual ITransitionBuilder DefaultTransition(object targetState)
 		{
-			return TransitionTo(StateMachine.DefaultEntryEvent, targetState);
+			return new TransitionBuilder(this, StateMachine.DefaultEntryEvent, targetState);
 		}
 
-		public virtual IStateBuilder DefaultTransition(object targetState, Func<bool> guard)
+		public virtual ITransitionBuilder TransitionOn(object eventTarget)
 		{
-			return TransitionTo(StateMachine.DefaultEntryEvent, targetState, guard);
+			return new TransitionBuilder(this, eventTarget);
 		}
 
-		public virtual IStateBuilder TransitionTo(object eventTarget, object targetState)
+		public virtual ITransitionBuilder TransitionOn(object eventTarget, object targetState)
 		{
-			var transitionSpec = new TransitionSpec(Id, eventTarget, targetState);
-			secondPassActions.Add(s => s.AddTransition(transitionSpec.CreateTransition(Context)));
-			return this;
-		}
-
-		public virtual IStateBuilder TransitionTo(object eventTarget, object targetState, Func<bool> guard)
-		{
-			var transitionSpec = new GuardedTransitionSpec(Id, eventTarget, targetState, guard);
-			secondPassActions.Add(s => s.AddTransition(transitionSpec.CreateTransition(Context)));
-			return this;
+			return new TransitionBuilder(this, eventTarget, targetState);
 		}
 
 		public virtual IStateBuilder InitialState()
@@ -131,40 +117,5 @@ namespace Moe.StateMachine
 			return new StateBuilder(parent, stateId, Context);
 		}
 		#endregion
-	}
-
-	public class TransitionSpec
-	{
-		public object SourceState { get; private set; }
-		public object Event { get; private set; }
-		public object TargetState { get; private set; }
-
-		public TransitionSpec(object source, object eventType, object target)
-		{
-			SourceState = source;
-			Event = eventType;
-			TargetState = target;
-		}
-
-		public virtual Transition CreateTransition(IStateBuilderContext context)
-		{
-			return new Transition(context.Resolve(SourceState), Event, context.Resolve(TargetState));
-		}
-	}
-
-	public class GuardedTransitionSpec : TransitionSpec
-	{
-		public Func<bool> Guard { get; private set; }
-
-		public GuardedTransitionSpec(object source, object eventType, object target, Func<bool> guard)
-			: base(source, eventType, target)
-		{
-			Guard = guard;
-		}
-
-		public override Transition CreateTransition(IStateBuilderContext context)
-		{
-			return new GuardedTransition(context.Resolve(SourceState), Event, context.Resolve(TargetState), Guard);
-		}
 	}
 }

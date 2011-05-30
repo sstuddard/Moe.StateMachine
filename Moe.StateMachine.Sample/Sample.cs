@@ -41,18 +41,18 @@ namespace Moe.StateMachine.Sample
 
 			stateMachineBuilder = new StateMachineBuilder();
 			stateMachineBuilder.AddState(States.Green)
-				.TransitionTo(Events.Change, States.Yellow)
+				.TransitionOn(Events.Change, States.Yellow)
 				.OnEnter(s => pnlGreen.BackColor = GreenOn)
 				.OnExit(s => pnlGreen.BackColor = GreenOff)
 				.Timeout(3000, States.Yellow)
 				.InitialState();
 			stateMachineBuilder.AddState(States.Yellow)
-				.TransitionTo(Events.Change, States.Red)
+				.TransitionOn(Events.Change, States.Red)
 				.Timeout(3000, States.Red)
 				.OnEnter(s => pnlYellow.BackColor = YellowOn)
 				.OnExit(s => pnlYellow.BackColor = YellowOff);
 			stateMachineBuilder.AddState(States.Red)
-				.TransitionTo(Events.Change, States.Green)
+				.TransitionOn(Events.Change, States.Green)
 				.Timeout(3000, States.Green)
 				.OnEnter(s => pnlRed.BackColor = RedOn)
 				.OnExit(s => pnlRed.BackColor = RedOff);
