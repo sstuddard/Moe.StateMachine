@@ -142,7 +142,7 @@ namespace Moe.StateMachine
 		{
 		}
 
-		internal T GetPlugIn<T>()
+		public T GetPlugIn<T>()
 		{
 			return (T) plugins.Find(pi => pi is T);
 		}

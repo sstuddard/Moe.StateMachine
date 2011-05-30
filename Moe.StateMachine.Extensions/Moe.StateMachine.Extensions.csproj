@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{966E7E08-3DFB-4B20-9FF3-E315CFC47875}</ProjectGuid>
+    <ProjectGuid>{07EC8883-C09E-4972-8D4F-44663BC61DF8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Moe.StateMachine</RootNamespace>
-    <AssemblyName>Moe.StateMachine</AssemblyName>
+    <RootNamespace>Moe.StateMachine.Extensions</RootNamespace>
+    <AssemblyName>Moe.StateMachine.Extensions</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -37,13 +37,16 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisLogFile>bin\Debug\Moe.StateMachine.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisLogFile>bin\Debug\Moe.StateMachine.Extensions.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -51,13 +54,15 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisLogFile>bin\Release\Moe.StateMachine.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisLogFile>bin\Release\Moe.StateMachine.Extensions.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -68,34 +73,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Builders\IStateBuilder.cs" />
-    <Compile Include="Builders\IStateBuilderContext.cs" />
-    <Compile Include="Builders\StateBuilder.cs" />
-    <Compile Include="Builders\StateBuilderContext.cs" />
-    <Compile Include="Builders\StateBuilderExtensions.cs" />
-    <Compile Include="Builders\StateMachineBuilder.cs" />
-    <Compile Include="Events\EventInstance.cs" />
-    <Compile Include="Events\EventProcessor.cs" />
-    <Compile Include="Events\SynchronousEventProcessor.cs" />
-    <Compile Include="Events\ThreadSafeQueue.cs" />
-    <Compile Include="Extensions\Actions\ActionBuilder.cs" />
-    <Compile Include="Extensions\Actions\SimpleActions.cs" />
-    <Compile Include="Extensions\Actions\TransitionReceipt.cs" />
-    <Compile Include="Events\SingleStateEventInstance.cs" />
-    <Compile Include="Extensions\IPlugIn.cs" />
-    <Compile Include="StateEventArgs.cs" />
-    <Compile Include="States\RootState.cs" />
-    <Compile Include="States\State.cs" />
-    <Compile Include="States\StateExtensions.cs" />
-    <Compile Include="States\StateTransitionEventArgs.cs" />
+    <Compile Include="Asynchronous\AsynchronousBuilder.cs" />
+    <Compile Include="Asynchronous\AsynchronousPlugIn.cs" />
+    <Compile Include="Logger\ConsoleLogger.cs" />
+    <Compile Include="Logger\ILogger.cs" />
+    <Compile Include="Logger\LoggerBuilder.cs" />
+    <Compile Include="Logger\LoggerPlugIn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StateMachine.cs" />
-    <Compile Include="States\TransitionDirector.cs" />
-    <Compile Include="Transitions\GuardedTransition.cs" />
-    <Compile Include="Transitions\Transition.cs" />
-    <Compile Include="Transitions\TransitionEvent.cs" />
+    <Compile Include="StateWatcher\CompositeStateWatcherAction.cs" />
+    <Compile Include="StateWatcher\StateWatcherAction.cs" />
+    <Compile Include="StateWatcher\StateWatcherBuilder.cs" />
+    <Compile Include="Timers\ITimer.cs" />
+    <Compile Include="Timers\TimeoutEvent.cs" />
+    <Compile Include="Timers\TimeoutPlugin.cs" />
+    <Compile Include="Timers\TimerBuilder.cs" />
+    <Compile Include="Timers\TimerPlugin.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Moe.StateMachine\Moe.StateMachine.csproj">
+      <Project>{966E7E08-3DFB-4B20-9FF3-E315CFC47875}</Project>
+      <Name>Moe.StateMachine</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

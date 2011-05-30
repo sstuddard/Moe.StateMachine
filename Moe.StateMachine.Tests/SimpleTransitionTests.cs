@@ -137,55 +137,9 @@ namespace Moe.StateMachine.Tests
 			Assert.IsTrue(sm.InState(States.Yellow));
 		}
 
-		[Test]
-		public void Test_Transitions_EntryExit_WithContext()
-		{
-			smb.AddState(States.Green)
-				.TransitionTo(Events.Change, States.Yellow)
-				.OnExit(CaptureEvent)
-				.InitialState();
-			smb.AddState(States.Yellow)
-				.TransitionTo(Events.Change, States.Red);
-			smb.AddState(States.Red)
-				.OnEnter(CaptureEvent)
-				.TransitionTo(Events.Change, States.Green);
-
-			StateMachine sm = new StateMachine(smb);
-			sm.Start();
-
-			var lookup = new Dictionary<string, string>();
-			lookup["Did"] = "exit";
-
-			sm.PostEvent(new MyEvent(Events.Change, lookup));
-			Assert.IsNotNull(receivedEvent);
-			Assert.IsTrue(receivedEvent["Did"] != null);
-			Assert.AreEqual("exit", receivedEvent["Did"]);
-
-			receivedEvent = null;
-			lookup["Did"] = "enter";
-			sm.PostEvent(new MyEvent(Events.Change, lookup));
-			Assert.IsNotNull(receivedEvent);
-			Assert.IsTrue(receivedEvent["Did"] != null);
-			Assert.AreEqual("enter", receivedEvent["Did"]);
-		}
-
-		private EventWithLookup<Events> receivedEvent;
-		private void CaptureEvent(TransitionReceipt receipt)
-		{
-			receivedEvent = receipt.Event as MyEvent;
-		}
-
 		private void CaptureState(string prefix, object state)
 		{
 			events.Add(String.Format("{0}: {1}", prefix, state.ToString()));
-		}
-
-		private class MyEvent : EventWithLookup<Events>
-		{
-			public MyEvent(Events eventId, Dictionary<string,string> lookup)
-				: base(eventId, lookup)
-			{
-			}
 		}
 	}
 }
