@@ -28,6 +28,12 @@ namespace Moe.StateMachine.Extensions.Asynchronous
 			stateMachine.Stopping += delegate { Stop(); };
 		}
 
+		public override void AddEvent(EventInstance eventToAdd)
+		{
+			base.AddEvent(eventToAdd);
+			eventsQueued.Set();
+		}
+
 		private void RunMachine()
 		{
 			try

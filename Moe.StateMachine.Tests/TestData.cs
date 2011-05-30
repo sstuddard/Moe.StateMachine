@@ -18,7 +18,6 @@
 	public enum Events
 	{
 		Change,
-		Panic,
-		Pulse
+		Panic
 	}
 }

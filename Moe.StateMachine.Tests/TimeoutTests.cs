@@ -1,4 +1,7 @@
-﻿using Moe.StateMachine.Extensions.Timers;
+﻿using System.Threading;
+using Moe.StateMachine.Extensions.Asynchronous;
+using Moe.StateMachine.Extensions.Logger;
+using Moe.StateMachine.Extensions.Timers;
 using NUnit.Framework;
 
 namespace Moe.StateMachine.Tests
@@ -7,11 +10,13 @@ namespace Moe.StateMachine.Tests
 	public class TimeoutTests
 	{
 		private StateMachineBuilder smb;
+		private AutoResetEvent postEventHandle;
 
 		[SetUp]
 		public void Setup()
 		{
 			smb = new StateMachineBuilder();
+			postEventHandle = new AutoResetEvent(false);
 		}
 
 		[Test]
@@ -24,12 +29,11 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			var sm = new StateMachine(smb);
+			var sm = new StateMachine(smb).Asynchronous().Logger(new ConsoleLogger());
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
-			System.Threading.Thread.Sleep(150);
-			sm.PostEvent(Events.Pulse);
+			System.Threading.Thread.Sleep(110);
 			Assert.IsTrue(sm.InState(States.Red));
 		}
 
@@ -49,8 +53,7 @@ namespace Moe.StateMachine.Tests
 			Assert.IsTrue(sm.InState(States.Green));
 			sm.PostEvent(Events.Change);
 			Assert.IsTrue(sm.InState(States.Yellow));
-			System.Threading.Thread.Sleep(110);
-			sm.PostEvent(Events.Pulse);
+			System.Threading.Thread.Sleep(120);
 			Assert.IsTrue(sm.InState(States.Yellow));
 		}
 
@@ -64,12 +67,11 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			var sm = new StateMachine(smb);
+			var sm = new StateMachine(smb).Asynchronous();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
 			System.Threading.Thread.Sleep(110);
-			sm.PostEvent(Events.Pulse);
 			Assert.IsTrue(sm.InState(States.Green));
 		}
 
@@ -86,7 +88,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionTo(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionTo(Events.Change, States.Green);
 
-			var sm = new StateMachine(smb);
+			var sm = new StateMachine(smb).Asynchronous();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -109,13 +111,12 @@ namespace Moe.StateMachine.Tests
 			smb[States.Green][States.GreenChild2]
 				.Timeout(200, States.Gold);
 
-			var sm = new StateMachine(smb);
+			var sm = new StateMachine(smb).Asynchronous();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.GreenChild));
 			sm.PostEvent(Events.Change);
 			System.Threading.Thread.Sleep(210);
-			sm.PostEvent(Events.Pulse);
 			Assert.IsTrue(sm.InState(States.Gold));
 		}
 
@@ -146,7 +147,6 @@ namespace Moe.StateMachine.Tests
 			sm.PostEvent(Events.Change);
 			Assert.IsTrue(sm.InState(States.GreenChild2));
 			System.Threading.Thread.Sleep(310);
-			sm.PostEvent(Events.Pulse);
 			Assert.IsTrue(sm.InState(States.Gold));
 		}
 	}
