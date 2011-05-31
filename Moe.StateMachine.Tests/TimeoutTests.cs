@@ -9,14 +9,6 @@ namespace Moe.StateMachine.Tests
 	[TestFixture]
 	public class TimeoutTests : BaseTest
 	{
-		private AutoResetEvent postEventHandle;
-
-		[SetUp]
-		public void Setup()
-		{
-			postEventHandle = new AutoResetEvent(false);
-		}
-
 		[Test]
 		public void Test_TimeoutEvent_TimeoutFires()
 		{

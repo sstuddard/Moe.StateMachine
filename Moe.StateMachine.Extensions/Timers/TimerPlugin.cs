@@ -11,7 +11,7 @@ namespace Moe.StateMachine.Extensions.Timers
 		private StateMachine stateMachine;
 		private readonly AutoResetEvent alarmReady;
 		private Thread stateThread;
-		private ILogger logger;
+		private LoggerPlugIn logger;
 
 		private List<ITimer> timers;
 
@@ -23,9 +23,7 @@ namespace Moe.StateMachine.Extensions.Timers
 
 		private void Start()
 		{
-			var loggerPlugIn = stateMachine.GetPlugIn<LoggerPlugIn>();
-			if (loggerPlugIn != null)
-				logger = loggerPlugIn.Logger;
+			logger = stateMachine.GetPlugIn<LoggerPlugIn>();
 
 			stateThread = new Thread(RunAlarm);
 			stateThread.Start();

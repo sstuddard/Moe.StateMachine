@@ -13,8 +13,6 @@ namespace Moe.StateMachine.Extensions.Logger
 			this.logger = logger;
 		}
 
-		public ILogger Logger { get { return logger; } }
-
 		public void Initialize(StateMachine sm)
 		{
 			stateMachine = sm;
@@ -37,7 +35,7 @@ namespace Moe.StateMachine.Extensions.Logger
 			state.Exited += delegate { Log("Exited {0}", state); };
 		}
 
-		private void Log(string message, params object[] messageParams)
+		public void Log(string message, params object[] messageParams)
 		{
 			if (logger != null)
 				logger.Log("[fsm:{0}] {1}", stateMachine.Name, string.Format(message, messageParams));
