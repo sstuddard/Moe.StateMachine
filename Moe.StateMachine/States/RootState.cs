@@ -18,13 +18,13 @@ namespace Moe.StateMachine.States
 		/// </summary>
 		/// <param name="eventToProcess"></param>
 		/// <returns></returns>
-		public override State ProcessEvent(State sourceState, EventInstance eventToProcess)
+		public override State ProcessEvent(State originalState, EventInstance eventToProcess)
 		{
 			Transition transition = transitions.MatchTransition(eventToProcess);
 			if (transition != null)
-				return TraverseDown(new TransitionEvent(transition, eventToProcess));
+				return TraverseDown(new TransitionEvent(this, transition, eventToProcess));
 
-			return sourceState;
+			return originalState;
 		}
 
 		/// <summary>
@@ -32,14 +32,14 @@ namespace Moe.StateMachine.States
 		/// </summary>
 		/// <param name="transition"></param>
 		/// <returns></returns>
-		protected override State TraverseUp(TransitionEvent transition)
+		public override State TraverseUp(TransitionEvent transition)
 		{
 			// Traverse down to children?
 			foreach (State substate in Substates)
 			{
 				if (substate.ContainsState(transition.TargetState))
 				{
-					return substate.Accept(transition);
+					return substate.TraverseDown(transition);
 				}
 			}
 

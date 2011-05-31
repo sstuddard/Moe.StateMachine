@@ -6,16 +6,14 @@ using NUnit.Framework;
 namespace Moe.StateMachine.Tests
 {
 	[TestFixture]
-	public class TestSimpleTransitions
+	public class TestSimpleTransitions : BaseTest
 	{
 		private List<string> events;
-		private StateMachineBuilder smb;
 
 		[SetUp]
 		public void Setup()
 		{
 			events = new List<string>();
-			smb = new StateMachineBuilder();
 		}
 
 		[Test]
@@ -25,7 +23,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -38,7 +36,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -58,7 +56,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -81,7 +79,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).OnEnter(tr => CaptureState("Enter", States.Yellow)).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).OnEnter(tr => CaptureState("Enter", States.Red)).TransitionOn(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			sm.PostEvent(Events.Change);
@@ -103,7 +101,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).OnExit(tr => CaptureState("Exit", States.Yellow)).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).OnExit(tr => CaptureState("Exit", States.Red)).TransitionOn(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			sm.PostEvent(Events.Change);
@@ -127,7 +125,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
-			StateMachine sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			// Transition should not go

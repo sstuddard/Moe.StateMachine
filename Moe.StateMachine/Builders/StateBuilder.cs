@@ -8,7 +8,7 @@ namespace Moe.StateMachine
 {
 	public class StateBuilder : IStateBuilder
 	{
-		protected readonly List<IStateBuilder> substates;
+		protected readonly List<IBaseStateBuilder> substates;
 		protected readonly List<Action<State>> secondPassActions;
 		protected State state;
 
@@ -18,7 +18,7 @@ namespace Moe.StateMachine
 			Id = stateId;
 			Context = context;
 
-			substates = new List<IStateBuilder>();
+			substates = new List<IBaseStateBuilder>();
 			secondPassActions = new List<Action<State>>();
 		}
 
@@ -29,7 +29,7 @@ namespace Moe.StateMachine
 			{
 				state = CreateState(Id, parent);
 
-				foreach (IStateBuilder substate in substates)
+				foreach (IBaseStateBuilder substate in substates)
 				{
 					state.AddChildState(substate.Build(state));
 				}
@@ -48,7 +48,7 @@ namespace Moe.StateMachine
 		public IStateBuilderContext Context { get; private set; }
 		public object Id { get; private set; }
 		public IStateBuilder Parent { get; private set; }
-		public IEnumerable<IStateBuilder> SubStates { get { return new List<IStateBuilder>(substates); } }
+		public IEnumerable<IBaseStateBuilder> SubStates { get { return new List<IBaseStateBuilder>(substates); } }
 
 		public void AddSecondPassAction(Action<State> action)
 		{
@@ -110,6 +110,12 @@ namespace Moe.StateMachine
 			substates.Add(newState);
 
 			return newState;
+		}
+
+		public virtual IStateBuilder AddHistory()
+		{
+			substates.Add(new HistoryStateBuilder(this));
+			return this;
 		}
 
 		public virtual IStateBuilder CreateStateBuilder(object stateId, IStateBuilder parent)

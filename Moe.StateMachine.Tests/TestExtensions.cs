@@ -4,15 +4,12 @@ using Moe.StateMachine.Extensions.StateWatcher;
 namespace Moe.StateMachine.Tests
 {
 	[TestFixture]
-	public class TestExtensions
+	public class TestExtensions : BaseTest
 	{
-		private StateMachineBuilder smb;
-
 		[SetUp]
 		public void Setup()
 		{
 			stateCalledBack = null;
-			smb = new StateMachineBuilder();
 		}
 
 		[Test]
@@ -22,7 +19,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
-			var sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.AddStateWatcher(StateCallback, States.Red);
 
 			Assert.IsNull(stateCalledBack);
@@ -48,7 +45,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
-			var sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.AddStateWatcher(StateCallback, States.Red, States.Yellow);
 
 			Assert.IsNull(stateCalledBack);
@@ -67,7 +64,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
-			var sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			// Do full cycle
@@ -98,7 +95,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
-			var sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			// Do full cycle
@@ -123,7 +120,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
-			var sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			stateCalledBack = null;

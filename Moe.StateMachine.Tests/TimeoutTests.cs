@@ -7,15 +7,13 @@ using NUnit.Framework;
 namespace Moe.StateMachine.Tests
 {
 	[TestFixture]
-	public class TimeoutTests
+	public class TimeoutTests : BaseTest
 	{
-		private StateMachineBuilder smb;
 		private AutoResetEvent postEventHandle;
 
 		[SetUp]
 		public void Setup()
 		{
-			smb = new StateMachineBuilder();
 			postEventHandle = new AutoResetEvent(false);
 		}
 
@@ -29,7 +27,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
-			var sm = new StateMachine("Test", smb).Asynchronous().Logger(new ConsoleLogger());
+			CreateStateMachine().Asynchronous();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -47,7 +45,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
-			var sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -67,7 +65,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
-			var sm = new StateMachine("Test", smb).Asynchronous();
+			CreateStateMachine().Asynchronous();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -88,7 +86,7 @@ namespace Moe.StateMachine.Tests
 			smb.AddState(States.Yellow).TransitionOn(Events.Change, States.Red);
 			smb.AddState(States.Red).TransitionOn(Events.Change, States.Green);
 
-			var sm = new StateMachine("Test", smb).Asynchronous();
+			CreateStateMachine().Asynchronous();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.Green));
@@ -111,7 +109,7 @@ namespace Moe.StateMachine.Tests
 			smb[States.Green][States.GreenChild2]
 				.Timeout(200, States.Gold);
 
-			var sm = new StateMachine("Test", smb).Asynchronous();
+			CreateStateMachine().Asynchronous();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.GreenChild));
@@ -136,7 +134,7 @@ namespace Moe.StateMachine.Tests
 				.Timeout(1000, States.Red)
 				.TransitionOn(Events.Change, States.GreenChild);
 
-			var sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.GreenChild));

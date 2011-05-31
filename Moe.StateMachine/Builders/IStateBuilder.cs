@@ -5,19 +5,16 @@ using Moe.StateMachine.States;
 
 namespace Moe.StateMachine
 {
-	public interface IStateBuilder
+	public interface IStateBuilder : IBaseStateBuilder
 	{
-		object Id { get; }
-
-		State Build(State parent);
-		IEnumerable<IStateBuilder> SubStates { get; }
+		IEnumerable<IBaseStateBuilder> SubStates { get; }
 		IStateBuilderContext Context { get; }
 
 		void AddSecondPassAction(Action<State> action);
 
 		// State building
 		IStateBuilder AddState(object stateId);
-//		IStateBuilder AddHistory();
+		IStateBuilder AddHistory();
 		IStateBuilder this[object stateId] { get; }
 
 		// Transition support

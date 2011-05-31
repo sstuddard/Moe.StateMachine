@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Moe.StateMachine.Builders
 {
@@ -6,7 +7,7 @@ namespace Moe.StateMachine.Builders
 	{
 		public static void VisitChildren(this IStateBuilder s, Action<IStateBuilder> action)
 		{
-			foreach (IStateBuilder child in s.SubStates)
+			foreach (IStateBuilder child in s.SubStates.Where(state => state is IStateBuilder))
 			{
 				action(child);
 				child.VisitChildren(action);

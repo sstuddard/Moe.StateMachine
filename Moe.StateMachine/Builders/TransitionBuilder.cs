@@ -44,7 +44,7 @@ namespace Moe.StateMachine.Builders
 		{
 			if (targetStateId != null)
 				throw new InvalidOperationException("Target state already specified for this transition");
-
+			targetStateId = new HistoryStateId(stateId);
 			return this;
 		}
 
@@ -60,7 +60,7 @@ namespace Moe.StateMachine.Builders
 		private Transition CreateTransition()
 		{
 			if (targetStateId == null)
-				throw new InvalidOperationException("Cannot create transition without target state");
+				throw new InvalidOperationException("Cannot create " + stateBuilder.Id + ":" + eventId + " transition without target state");
 
 			if (guard == null)
 				return new Transition(Context.Resolve(Id), eventId, Context.Resolve(targetStateId));
@@ -68,14 +68,10 @@ namespace Moe.StateMachine.Builders
 			return new GuardedTransition(Context.Resolve(Id), eventId, Context.Resolve(targetStateId), guard);
 		}
 
-		private void OnExitingTransitionBuilder()
-		{
-		}
-
 		#region IStateBuilder forwarders
 		public object Id { get { return stateBuilder.Id; } }
 		public IStateBuilderContext Context { get { return stateBuilder.Context; } }
-		public IEnumerable<IStateBuilder> SubStates { get { return stateBuilder.SubStates; } }
+		public IEnumerable<IBaseStateBuilder> SubStates { get { return stateBuilder.SubStates; } }
 		public IStateBuilder this[object stateId] { get { return stateBuilder[stateId]; } }
 
 		public State Build(State parent)
@@ -90,39 +86,33 @@ namespace Moe.StateMachine.Builders
 
 		public IStateBuilder AddState(object stateId)
 		{
-			OnExitingTransitionBuilder();
 			return stateBuilder.AddState(stateId);
+		}
+
+		public IStateBuilder AddHistory()
+		{
+			return stateBuilder.AddHistory();
 		}
 
 		public ITransitionBuilder DefaultTransition(object targetState)
 		{
-			OnExitingTransitionBuilder();
 			return stateBuilder.DefaultTransition(targetState);
 		}
 
 		public ITransitionBuilder TransitionOn(object eventTarget)
 		{
-			OnExitingTransitionBuilder();
 			return stateBuilder.TransitionOn(eventTarget);
 		}
 
 		public ITransitionBuilder TransitionOn(object eventTarget, object targetState)
 		{
-			OnExitingTransitionBuilder();
 			return stateBuilder.TransitionOn(eventTarget, targetState);
 		}
 
 		public IStateBuilder InitialState()
 		{
-			OnExitingTransitionBuilder();
 			return stateBuilder.InitialState();
 		}
 		#endregion
-
-		private class HistoryTargetState
-		{
-			public object StateId { get; private set; }
-
-		}
 	}
 }

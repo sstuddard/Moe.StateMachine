@@ -68,6 +68,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builders\HistoryStateBuilder.cs" />
+    <Compile Include="Builders\IBaseStateBuilder.cs" />
     <Compile Include="Builders\IStateBuilder.cs" />
     <Compile Include="Builders\IStateBuilderContext.cs" />
     <Compile Include="Builders\ITransitionBuilder.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="Events\SingleStateEventInstance.cs" />
     <Compile Include="Extensions\IPlugIn.cs" />
     <Compile Include="StateEventArgs.cs" />
+    <Compile Include="States\HistoryState.cs" />
     <Compile Include="States\RootState.cs" />
     <Compile Include="States\State.cs" />
     <Compile Include="States\StateExtensions.cs" />

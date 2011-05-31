@@ -4,7 +4,7 @@
 	{
 		Green,
 		GreenParent,
-		GreenParentHistory,
+		GreenGrandParent,
 		GreenChild,
 		GreenChild2,
 		GreenGrandChild,

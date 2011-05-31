@@ -4,16 +4,14 @@ using NUnit.Framework;
 namespace Moe.StateMachine.Tests
 {
 	[TestFixture]
-	public class TestHeirarchicalTransitions
+	public class TestHeirarchicalTransitions : BaseTest
 	{
 		private List<string> events;
-		private StateMachineBuilder smb;
 
 		[SetUp]
 		public void Setup()
 		{
 			events = new List<string>();
-			smb = new StateMachineBuilder();
 		}
 
 		[Test]
@@ -23,7 +21,7 @@ namespace Moe.StateMachine.Tests
 				.AddState(States.GreenChild).InitialState();
 			smb.AddState(States.RedParent);
 
-			StateMachine sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.GreenParent));
@@ -37,12 +35,53 @@ namespace Moe.StateMachine.Tests
 				.AddState(States.GreenChild).InitialState();
 			smb.AddState(States.RedParent).TransitionOn(Events.Change, States.GreenParent).InitialState();
 
-			StateMachine sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			Assert.IsTrue(sm.InState(States.RedParent));
 			sm.PostEvent(Events.Change);
 			Assert.IsTrue(sm.InState(States.GreenChild));
+		}
+
+		[Test]
+		public void Test_Transition_WithinSuperstate()
+		{
+			smb.AddState(States.GreenParent)
+				.OnEnter(tr => OnEnter(States.GreenParent))
+				.OnExit(tr => OnExit(States.GreenParent))
+				.InitialState()
+					.AddState(States.Green)
+					.OnEnter(tr => OnEnter(States.Green))
+					.OnExit(tr => OnExit(States.Green))
+					.InitialState()
+					.TransitionOn(Events.Change).To(States.Yellow);
+			smb[States.GreenParent]
+				.AddState(States.Yellow)
+				.OnEnter(tr => OnEnter(States.Yellow))
+				.OnExit(tr => OnExit(States.Yellow))
+				.TransitionOn(Events.Change).To(States.Red);
+			smb[States.GreenParent]
+				.AddState(States.Red)
+				.OnEnter(tr => OnEnter(States.Red))
+				.OnExit(tr => OnExit(States.Red))
+				.TransitionOn(Events.Change).To(States.Red);
+
+			CreateStateMachine();
+			sm.Start();
+
+			events.Clear();
+
+			Assert.IsTrue(sm.InState(States.GreenParent));
+			Assert.IsTrue(sm.InState(States.Green));
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.Yellow));
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.Red));
+
+			Assert.AreEqual("Exit: Green", events[0]);
+			Assert.AreEqual("Enter: Yellow", events[1]);
+			Assert.AreEqual("Exit: Yellow", events[2]);
+			Assert.AreEqual("Enter: Red", events[3]);
 		}
 
 		[Test]
@@ -68,7 +107,7 @@ namespace Moe.StateMachine.Tests
 					.OnEnter(tr => OnEnter(States.RedChild))
 					.OnExit(tr => OnExit(States.RedChild));
 
-			StateMachine sm = new StateMachine("Test", smb);
+			CreateStateMachine();
 			sm.Start();
 
 			events.Clear();
