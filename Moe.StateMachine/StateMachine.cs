@@ -50,6 +50,7 @@ namespace Moe.StateMachine
 			AddPlugIn(new SynchronousEventProcessor());
 
 			root = initializer.Initialize(this);
+			InitializeStates();
 
 			stateMachineState = StateMachineState.Ready;
 		}
@@ -137,6 +138,14 @@ namespace Moe.StateMachine
 		{
 			current = args.State;
 			EventProcessed(this, args);
+		}
+
+		private void InitializeStates()
+		{
+			root.VisitChildren(s =>
+			                    {
+			                        s.Traversing += (o, args) => current = args.State;
+			                    });
 		}
 
 		public virtual void Dispose()

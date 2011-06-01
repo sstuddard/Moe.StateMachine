@@ -9,6 +9,7 @@ namespace Moe.StateMachine.States
 	{
 		public event EventHandler<StateTransitionEventArgs> Entered;
 		public event EventHandler<StateTransitionEventArgs> Exited;
+		public event EventHandler<StateEventArgs> Traversing;
 
 		private State parent;
 		private object id;
@@ -21,6 +22,10 @@ namespace Moe.StateMachine.States
 			this.parent = parent;
 			this.substates = new List<State>();
 			this.transitions = new TransitionDirector();
+
+			Entered += delegate { };
+			Exited += delegate { };
+			Traversing += delegate { };
 		}
 
 		public object Id { get { return id; } }
@@ -34,14 +39,12 @@ namespace Moe.StateMachine.States
 
 		protected virtual void Enter(TransitionEvent transition)
 		{
-			if (Entered != null)
-				Entered(this, new StateTransitionEventArgs(transition));
+			Entered(this, new StateTransitionEventArgs(transition));
 		}
 
 		protected virtual void Exit(TransitionEvent transition)
 		{
-			if (Exited != null)
-				Exited(this, new StateTransitionEventArgs(transition));
+			Exited(this, new StateTransitionEventArgs(transition));
 		}
 
 		public void AddTransition(Transition transition)
@@ -52,7 +55,7 @@ namespace Moe.StateMachine.States
 		public override bool Equals(object obj)
 		{
 			if (obj is State)
-				return ((State) obj).Id.Equals(this.Id);
+				return ((State) obj).Id.Equals(Id);
 			return false;
 		}
 
@@ -83,11 +86,13 @@ namespace Moe.StateMachine.States
 				}
 			}
 
+			// Not handled, pass it up the chain
 			return parent.ProcessEvent(originalState, eventToProcess);
 		}
 
 		public virtual State TraverseDown(TransitionEvent transitionEvent)
 		{
+			Traversing(this, new StateEventArgs(this));
 			Enter(transitionEvent);
 
 			if (!this.Equals(transitionEvent.TargetState))
@@ -98,6 +103,7 @@ namespace Moe.StateMachine.States
 
 		public virtual State TraverseUp(TransitionEvent transitionEvent)
 		{
+			Traversing(this, new StateEventArgs(this));
 			if (this.Equals(transitionEvent.TargetState))
 				return DispatchDefaults();
 
@@ -107,41 +113,6 @@ namespace Moe.StateMachine.States
 			Exit(transitionEvent);
 			return parent.TraverseUp(transitionEvent);
 		}
-
-		//public virtual State Accept(TransitionEvent transitionEvent)
-		//{
-		//    // Have we arrived?
-		//    if (transitionEvent.TargetState.Equals(this))
-		//    {
-		//        Enter(transitionEvent);
-		//        return DispatchDefaults();
-		//    }
-
-		//    if (this.ContainsState(transitionEvent.TargetState))
-		//        return TraverseDown(transitionEvent);
-
-		//    return TraverseUp(transitionEvent);
-		//}
-
-		//protected virtual State TraverseDown(TransitionEvent transitionEvent)
-		//{
-		//    // Traverse down to children?
-		//    State substate = this.GetSubstatePath(transitionEvent.TargetState);
-		//    if (substate != null)
-		//    {
-		//        Enter(transitionEvent);
-		//        return substate.Accept(transitionEvent);
-		//    }
-
-		//    // Definitely, should never happen.
-		//    throw new InvalidOperationException("Transition got lost in traversal");
-		//}
-
-		//protected virtual State TraverseUp(TransitionEvent transitionEvent)
-		//{
-		//    Exit(transitionEvent);
-		//    return parent.Accept(transitionEvent);
-		//}
 
 		protected virtual State DispatchDefaults()
 		{
