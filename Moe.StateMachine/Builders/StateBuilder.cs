@@ -114,7 +114,13 @@ namespace Moe.StateMachine
 
 		public virtual IStateBuilder AddHistory()
 		{
-			substates.Add(new HistoryStateBuilder(this));
+			substates.Add(HistoryStateBuilder.CreateShallowHistoryBuilder(this));
+			return this;
+		}
+
+		public virtual IStateBuilder AddDeepHistory()
+		{
+			substates.Add(HistoryStateBuilder.CreateDeepHistoryBuilder(this));
 			return this;
 		}
 

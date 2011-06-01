@@ -94,6 +94,11 @@ namespace Moe.StateMachine.Builders
 			return stateBuilder.AddHistory();
 		}
 
+		public IStateBuilder AddDeepHistory()
+		{
+			return stateBuilder.AddDeepHistory();
+		}
+
 		public ITransitionBuilder DefaultTransition(object targetState)
 		{
 			return stateBuilder.DefaultTransition(targetState);

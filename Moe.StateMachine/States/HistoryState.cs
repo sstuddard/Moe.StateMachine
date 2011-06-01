@@ -12,13 +12,16 @@ namespace Moe.StateMachine.States
 	/// </summary>
 	public class HistoryState : State
 	{
+		public delegate State HistoryFetchStrategy(HistoryState historyState, TransitionEvent transition);
 		public const string HistoryTransition = "HistoryTransition";
 
 		private State lastState;
+		private HistoryFetchStrategy historyFetcher;
 
-		public HistoryState(State parent)
+		public HistoryState(State parent, HistoryFetchStrategy historyStrategy)
 			: base(new HistoryStateId(parent.Id), parent)
 		{
+			historyFetcher = historyStrategy;
 			Parent.Exited += OnParentExit;
 		}
 
@@ -45,10 +48,20 @@ namespace Moe.StateMachine.States
 			}
 		}
 
-		private void OnParentExit(object sender, StateTransitionEventArgs args)
+		protected virtual void OnParentExit(object sender, StateTransitionEventArgs args)
 		{
-			State sourceState = args.TransitionEvent.SourceState;
-			lastState = Parent.GetSubstatePath(sourceState);
+			lastState = historyFetcher(this, args.TransitionEvent);
+		}
+
+		public static State GetShallowState(HistoryState historyState, TransitionEvent transitionEvent)
+		{
+			State sourceState = transitionEvent.SourceState;
+			return historyState.Parent.GetSubstatePath(sourceState);
+		}
+
+		public static State GetDeepState(HistoryState historyState, TransitionEvent transitionEvent)
+		{
+			return transitionEvent.SourceState;
 		}
 	}
 

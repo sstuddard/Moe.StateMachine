@@ -15,6 +15,7 @@ namespace Moe.StateMachine
 		// State building
 		IStateBuilder AddState(object stateId);
 		IStateBuilder AddHistory();
+		IStateBuilder AddDeepHistory();
 		IStateBuilder this[object stateId] { get; }
 
 		// Transition support
