@@ -42,23 +42,29 @@ namespace Moe.StateMachine.Sample
 			stateMachineBuilder = new StateMachineBuilder();
 			stateMachineBuilder.AddState(States.Green)
 				.TransitionOn(Events.Change, States.Yellow)
-				.OnEnter(s => pnlGreen.BackColor = GreenOn)
-				.OnExit(s => pnlGreen.BackColor = GreenOff)
+				.OnEnter(s => Invoker(() => pnlGreen.BackColor = GreenOn))
+				.OnExit(s => Invoker(() => pnlGreen.BackColor = GreenOff))
 				.Timeout(3000, States.Yellow)
 				.InitialState();
 			stateMachineBuilder.AddState(States.Yellow)
 				.TransitionOn(Events.Change, States.Red)
 				.Timeout(3000, States.Red)
-				.OnEnter(s => pnlYellow.BackColor = YellowOn)
-				.OnExit(s => pnlYellow.BackColor = YellowOff);
+				.OnEnter(s => Invoker(() => pnlYellow.BackColor = YellowOn))
+				.OnExit(s => Invoker(() => pnlYellow.BackColor = YellowOff));
 			stateMachineBuilder.AddState(States.Red)
 				.TransitionOn(Events.Change, States.Green)
 				.Timeout(3000, States.Green)
-				.OnEnter(s => pnlRed.BackColor = RedOn)
-				.OnExit(s => pnlRed.BackColor = RedOff);
+				.OnEnter(s => Invoker(() => pnlRed.BackColor = RedOn))
+				.OnExit(s => Invoker(() => pnlRed.BackColor = RedOff));
 
 			stateMachine = new StateMachine("StopLight", stateMachineBuilder);
 			stateMachine.Asynchronous();
+		}
+
+		private void Invoker(Action action)
+		{
+			if (InvokeRequired)
+				Invoke(action);
 		}
 
 		private void btnStart_Click(object sender, EventArgs e)
