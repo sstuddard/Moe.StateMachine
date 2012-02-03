@@ -80,6 +80,9 @@
     <Compile Include="Logger\LoggerBuilder.cs" />
     <Compile Include="Logger\LoggerPlugIn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StateDelegate\StateDelegateDescriptor.cs" />
+    <Compile Include="StateDelegate\StateDelegateBuilder.cs" />
+    <Compile Include="StateDelegate\StateDelegatePlugIn.cs" />
     <Compile Include="StateWatcher\CompositeStateWatcherAction.cs" />
     <Compile Include="StateWatcher\StateWatcherAction.cs" />
     <Compile Include="StateWatcher\StateWatcherBuilder.cs" />
