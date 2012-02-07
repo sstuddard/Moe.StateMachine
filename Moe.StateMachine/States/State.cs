@@ -124,8 +124,8 @@ namespace Moe.StateMachine.States
 				State substate = this.GetSubstatePath(transition.TargetState);
 				if (substate != null)
 					return substate.TraverseDown(transitionEvent);
-
-				throw new InvalidOperationException("Invalid default transition");
+				else
+					return TraverseUp(transitionEvent);
 			}
 
 			return this;

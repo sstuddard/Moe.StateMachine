@@ -30,6 +30,23 @@ namespace Moe.StateMachine.Tests
 		}
 
 		[Test]
+		public void Test_Transitions_DefaultTransition_ToNonSubState()
+		{
+			smb.AddState(States.GreenParent).InitialState();
+			smb.AddState(States.Red);
+			smb[States.GreenParent].AddState(States.Green).TransitionOn(Events.Change, States.Yellow).InitialState();
+			smb[States.GreenParent].AddState(States.Yellow);
+			smb[States.Yellow].DefaultTransition(States.Red);
+
+			CreateStateMachine();
+			sm.Start();
+
+			Assert.IsTrue(sm.InState(States.Green));
+			sm.PostEvent(Events.Change);
+			Assert.IsTrue(sm.InState(States.Red));
+		}
+
+		[Test]
 		public void Test_Transitions_BasicTransitions()
 		{
 			smb.AddState(States.Green).TransitionOn(Events.Change, States.Yellow).InitialState();
